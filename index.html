@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI-rådgivning — Commit AS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet" />
+<style>
+/* =========================================================
+   COMMIT DESIGN SYSTEM — v1.2
+   En felles stil for Commits dokumenter, websider og PDF-er.
+   Bruk via:
+   <link href="../Designsystem Commit/commit-style.css" rel="stylesheet" />
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet" />
+
+   Endringer i v1.2:
+   - Konsolidert font-stack til CSS-variabler (--font-sans, --font-serif).
+   - Slettet bakoverkompatibilitetsblokken for nakne <ul> i .content —
+     alle dokumenter bruker nå <ul class="bullets"> eksplisitt.
+   - @page bruker 20mm rundt hele (matcher Playwright-default uten
+     sidetopp/-bunn). Med sidetopp/-bunn bruker Playwright 25mm vert.
+
+   Endringer i v1.1:
+   - Løsnet basisstiler (p, strong, em) fra .content-wrapper — virker
+     globalt på body-nivå.
+   - .section + .section auto-spacing (3.5rem) — slipper inline-style.
+   - A11y: :focus-visible, prefers-reduced-motion, --ink-soft #5C5C5C.
+   - @page-regel for nettleser-print.
+   - Robust font-fallback (system-ui, … for Inter; Georgia for Lora).
+   - Komponentkommentarer.
+   ========================================================= */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue:       #2B5C96;
+  --blue-dark:  #1F4373;
+  --blue-light: #EBF1F9;
+  --ink:        #1a1a1a;
+  --ink-mid:    #3D3D3D;
+  --ink-soft:   #5C5C5C; /* bumpet fra #666666 for bedre kontrast på små tekster (~6:1 mot --bg) */
+  --line:       #E0DDD6;
+  --bg:         #FAFAF7;
+  --white:      #FFFFFF;
+  --warn-bg:    #FBF7EE;
+  --warn-line:  #E5D5A8;
+  --warn-ink:   #6B5215;
+  --container:  820px;
+
+  /* Font-stack med robust system-fallback. Bruk var(--font-sans) / var(--font-serif)
+     overalt for å unngå duplisering når stacken må oppdateres. */
+  --font-sans:  'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: 'Lora', 'Iowan Old Style', 'Apple Garamond', Georgia, 'Times New Roman', serif;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.55;
+}
+
+/* ── BASIS-TYPOGRAFI ──
+   Disse var tidligere bundet til .content-wrapper. Nå gjelder de globalt
+   på body-nivå, slik at <p>, <strong>, <em> får riktig stil uansett om
+   innholdet pakkes i .content eller ligger i en annen container.
+   Komponenter (.callout, .scenario, .contact-card, .example, .pullquote
+   osv.) overstyrer disse selv der det trengs — derfor er base-spesifisiteten
+   bevisst lav (body p i stedet for plain p). */
+body p {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--ink-mid);
+  margin-bottom: 1.2rem;
+}
+body strong { color: var(--ink); font-weight: 600; }
+body em { font-style: italic; color: var(--ink); }
+
+/* ── BULLET-LISTE (signaturen — blå prikk) ──
+   Eksplisitt opt-in via .bullets så vi ikke kaprer alle <ul> på siden
+   (komponenter som .pitfalls, .refs og .agenda har egne listestiler).
+   Nye dokumenter bør bruke <ul class="bullets">. */
+.bullets {
+  list-style: none;
+  margin: 0 0 1.4rem 0;
+  padding: 0;
+}
+.bullets > li {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--ink-mid);
+  padding-left: 1.4rem;
+  position: relative;
+  margin-bottom: 0.55rem;
+}
+.bullets > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.7rem;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+}
+
+/* Brødtekst-lenker i .content får underline by default for tilgjengelighet —
+   farge alene er ikke nok signal om at noe er klikkbart. Komponenter med
+   egne lenkestiler (.contact-detail a, .rsvp-btn, footer a) overstyrer
+   dette via egen spesifisitet. */
+.content a {
+  color: var(--blue);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+.content a:hover { color: var(--blue-dark); }
+
+/* ── FOKUS-RING (a11y) ──
+   Tastaturbrukere må se hvor fokus er. :focus-visible vises kun når brukeren
+   navigerer med tab (ikke ved museklikk), så det forstyrrer ikke pekerflyten. */
+a:focus-visible,
+button:focus-visible,
+.rsvp-btn:focus-visible,
+.contact-detail a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ── REDUCED MOTION (a11y) ──
+   Respekter brukerens systeminnstilling for redusert bevegelse. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ── NAV ── */
+/* Toppstripe med logo og evt. meta-tekst. Brukes på alle dokumenter. */
+header.topnav {
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.nav-wrap {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 74px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo-lockup {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  color: var(--ink);
+}
+.logo-lockup .logo-img { height: 26px; width: auto; display: block; }
+.logo-lockup .logo-secondary { height: 30px; width: auto; display: block; }
+.logo-divider {
+  width: 1px;
+  height: 26px;
+  background: var(--line);
+  display: block;
+}
+.nav-meta {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* ── HERO ── */
+/* Stor inngangsblokk: eyebrow + H1 (Lora med blå italic-aksent) + ingress.
+   Bruk på første side av dokumentet — rapport, guide, invitasjon. */
+.hero {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 5rem 2rem 3.5rem;
+}
+.eyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.eyebrow::after {
+  content: "";
+  display: block;
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.hero h1 {
+  font-family: var(--font-serif);
+  font-size: 3.2rem;
+  font-weight: 400;
+  line-height: 1.07;
+  letter-spacing: -0.8px;
+  color: var(--ink);
+  margin-bottom: 1.5rem;
+}
+.hero h1 .italic {
+  font-style: italic;
+  color: var(--blue);
+}
+.hero-subtitle {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.35rem;
+  color: var(--ink-mid);
+  line-height: 1.4;
+  margin-bottom: 1.4rem;
+  max-width: 640px;
+}
+.hero-ingress {
+  font-size: 1.15rem;
+  line-height: 1.65;
+  color: var(--ink-mid);
+  max-width: 640px;
+}
+
+/* ── FACT BAR (3-kolonne fakta-stripe) ── */
+/* Bruk når dokumentet skal åpne/avslutte med 3 nøkkeltall eller fakta-par
+   (dato, sted, varighet — eller honorar, varslingsfrist, kanal). */
+.facts {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.2rem;
+}
+.fact-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.5rem;
+}
+.fact-value {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.35;
+}
+.fact-sub {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  margin-top: 0.2rem;
+}
+
+/* ── CONTENT BLOCK ── */
+/* Hovedinnholds-wrapper. Sentrerer alt på 820 px og setter top/side-padding.
+   Innholds-typografien (p/ul/strong/em) gjelder globalt fra body-laget;
+   .content gir kun layout her. */
+.content {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 4rem 2rem 2rem;
+}
+.section {
+  margin-bottom: 3.5rem;
+}
+/* Hjelperegel: gir avstand mellom påfølgende seksjoner uten inline-style.
+   margin-bottom over fungerer fortsatt for første seksjon, denne er
+   redundant for normalt flow men sikrer korrekt spacing om noen velger
+   å nullstille margin-bottom lokalt. */
+.section + .section { margin-top: 3.5rem; }
+.section-num {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--blue);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.section-kicker {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.section-kicker.no-rule::after { display: none; }
+.section-kicker:not(.no-rule)::after {
+  content: "";
+  display: block;
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.section-title {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--ink);
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.3px;
+  line-height: 1.18;
+}
+.subsection-title {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 2rem 0 0.9rem;
+  letter-spacing: -0.2px;
+  line-height: 1.25;
+}
+
+/* Inline-stat (tall som skal stikke seg ut) */
+/* Bruk inni en setning for å fremheve et nøkkeltall: "honoraret på <span class="stat">12 000 kr</span>". */
+.stat,
+.stat-inline {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--blue);
+  font-style: italic;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── PULL QUOTE ── */
+/* Sitat eller forskningsspørsmål — blålys bakgrunn, blå venstrekant.
+   Bruk for å løfte fram en sentral påstand, et sitat fra en kilde, eller
+   det grunnleggende spørsmålet et notat forsøker å besvare. */
+.pullquote {
+  margin: 2rem 0;
+  padding: 1.8rem 2rem;
+  border-left: 3px solid var(--blue);
+  background: var(--blue-light);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.25rem;
+  line-height: 1.45;
+  color: var(--ink);
+  letter-spacing: -0.1px;
+}
+
+/* ── CALLOUT (advarsel/merknad — varm gul) ── */
+/* Bruk for skattefeller, "pass på", regulatoriske notater og andre
+   merknader leseren absolutt må fange opp. Holdes sparsomt — én eller to
+   per dokument. */
+.callout {
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-line);
+  border-left: 3px solid var(--warn-line);
+  border-radius: 4px;
+  padding: 1.2rem 1.4rem;
+  margin: 1.5rem 0 1.8rem;
+}
+.callout-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--warn-ink);
+  margin-bottom: 0.5rem;
+}
+.callout p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--ink-mid);
+  margin-bottom: 0;
+}
+.callout p + p { margin-top: 0.7rem; }
+.callout strong { color: var(--ink); }
+
+/* ── KEY/VALUE LIST (ratelist — for satser/priser) ── */
+/* Tett liste der venstre side er en etikett (hva) og høyre side et tall
+   (hvor mye). Bruk til prislister, satsoversikter, godtgjøringstabeller. */
+.ratelist {
+  margin: 1.2rem 0 2rem;
+  border-top: 1px solid var(--line);
+}
+.rate-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--line);
+  align-items: baseline;
+}
+.rate-label {
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+.rate-label-sub {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  margin-top: 0.15rem;
+}
+.rate-value {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--blue);
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── DEFINITION TABLE (2 kolonne kort-par) ── */
+/* To hvite kort side om side med liten label + tittel + body. Bruk når
+   to begreper skal stilles opp mot hverandre (f.eks. "før" vs "etter",
+   "regelen" vs "unntaket"). */
+.deftable {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin: 1.5rem 0 2rem;
+}
+.defcard {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1.6rem 1.6rem 1.4rem;
+}
+.defcard-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 0.6rem;
+}
+.defcard-title {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.6rem;
+}
+.defcard-body {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+.defcard-body strong { color: var(--ink); }
+
+/* ── DATA TABLE (3-kolonne, for teori/oversikter) ── */
+/* Tre-kolonne tabell egnet for teori-oversikter, lovparagrafer eller
+   andre rader der primærtekst, sekundærtekst og tertiærtekst hører
+   sammen. .is-2col gir et lett justert kolonneoppsett. */
+.datatable {
+  margin: 1.5rem 0 1.8rem;
+  border-top: 1px solid var(--line);
+  width: 100%;
+}
+.datatable-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1.2fr 2fr;
+  gap: 1.2rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+}
+.datatable-row.is-head {
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--ink);
+}
+.datatable-row.is-head > div {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.dt-primary {
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 0.96rem;
+  line-height: 1.4;
+}
+.dt-secondary {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+  font-style: italic;
+}
+.dt-tertiary {
+  font-size: 0.92rem;
+  color: var(--ink-mid);
+  line-height: 1.55;
+}
+.datatable.is-2col .datatable-row { grid-template-columns: 1fr 1.2fr 1.6fr; }
+
+/* ── TRACKS (2-kolonne kort med leder/lead — for tospor-agendaer) ── */
+/* Bruk når et arrangement har to parallelle spor (f.eks. teknisk vs.
+   forretning), eller for å presentere to alternative løp side om side. */
+.tracks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin-top: 2rem;
+}
+.track {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1.8rem;
+}
+.track-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 0.7rem;
+}
+.track-title {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.7rem;
+  line-height: 1.25;
+}
+.track-desc {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  margin-bottom: 1.2rem;
+}
+.track-lead {
+  font-size: 0.82rem;
+  color: var(--ink-mid);
+  border-top: 1px solid var(--line);
+  padding-top: 0.9rem;
+}
+.track-lead-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.2rem;
+}
+
+/* ── AGENDA (tidslinje) ── */
+/* Klokkeslett-basert programoversikt. Bruk i invitasjoner og program-
+   notater når noe skjer i en sekvens med faste tidspunkter. */
+.agenda {
+  margin-top: 2.5rem;
+  border-top: 1px solid var(--line);
+}
+.agenda-row {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 1.5rem;
+  padding: 1.4rem 0;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+}
+.agenda-time {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--blue);
+  font-variant-numeric: tabular-nums;
+}
+.agenda-body {
+  font-size: 1rem;
+  color: var(--ink);
+}
+.agenda-body strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+.agenda-body-sub {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  margin-top: 0.25rem;
+}
+
+/* ── PRESENTERS (ansiktssirkler med navn/rolle) ── */
+/* Bruk for å vise hvem som holder noe — foredragsholdere, panel,
+   verter. Liten rund profilbilde + navn + rolle. */
+.presenters {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+.presenter {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+.presenter img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+}
+.presenter-name {
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 0.92rem;
+}
+.presenter-role {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+/* ── HYPOTHESIS / NUMBERED CARDS (H1, H2 ...) ── */
+/* Hypotese-kort med stor italic-label til venstre (H1, H2 ...) og
+   beskrivelse til høyre. Bruk i fagnotater, masteroppgaver og
+   problemnotater der ulike hypoteser/forslag skal listes. */
+.hypotheses {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+  margin: 1.5rem 0 0.4rem;
+}
+.hyp {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 1.2rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1.3rem 1.5rem;
+  align-items: start;
+}
+.hyp-label {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.4rem;
+  color: var(--blue);
+  line-height: 1;
+}
+.hyp-body {
+  font-size: 0.97rem;
+  line-height: 1.6;
+  color: var(--ink-mid);
+}
+
+/* ── SCENARIOS (kort med label + tittel + kropp) ── */
+/* Bruk når ulike kontekster eller tilfeller skal beskrives parallelt
+   ("Scenario A: kunden er...", "Scenario B: kunden er..."). */
+.scenarios {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.2rem;
+  margin: 1.5rem 0 1rem;
+}
+.scenario {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1.6rem 1.8rem 1.5rem;
+}
+.scenario-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 0.5rem;
+}
+.scenario-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.7rem;
+  line-height: 1.3;
+}
+.scenario-body {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--ink-mid);
+}
+
+/* ── EXAMPLES (talleksempler — 2-kolonne kort med summlinje) ── */
+/* Konkrete talleksempler stilt opp mot hverandre — f.eks. "med fradrag"
+   vs. "uten fradrag", eller to ulike honorarberegninger. Hvert kort har
+   egen summlinje nederst. */
+.examples {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin-top: 1.5rem;
+}
+.example {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1.6rem 1.6rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+}
+.example-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 0.6rem;
+}
+.example-title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+.example-setup {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin-bottom: 1rem;
+}
+.example-lines {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--ink-mid);
+  margin-bottom: 0.9rem;
+}
+.example-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px dotted var(--line);
+}
+.example-line:last-child { border-bottom: none; }
+.example-line-text { color: var(--ink-mid); }
+.example-line-amount {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.example-total {
+  margin-top: auto;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+.example-total-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.example-total-amount {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-style: italic;
+  color: var(--blue);
+  font-size: 1.25rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── PITFALLS LIST (tett liste med separatorlinjer) ── */
+/* Bruk når en huskeliste/sjekkliste/feilliste skal være lett å skanne.
+   Tettere enn vanlig <ul>, ingen punkter, kun separatorlinjer mellom
+   punktene. Egnet for "vanlige feil", "ting å passe på". */
+.pitfalls {
+  list-style: none;
+  margin: 1.2rem 0 0 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.pitfalls li {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--ink-mid);
+}
+.pitfalls li::before { display: none; }
+.pitfalls li strong { color: var(--ink); }
+
+/* ── REFERENCES (akademisk litteraturliste) ── */
+/* Litteraturliste/kildehenvisninger med hengende innrykk. Bruk i
+   fagnotater og masteroppgavetekster der sitater må refereres formelt. */
+.refs {
+  margin-top: 1rem;
+  list-style: none;
+  padding: 0;
+}
+.refs li {
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--ink-mid);
+  padding-left: 1.6rem;
+  text-indent: -1.6rem;
+  margin-bottom: 0.65rem;
+}
+.refs li::before { display: none; }
+.refs li em { font-style: italic; }
+
+/* ── CONTACT CARD (lyseblå kontaktboks) ── */
+/* Avsluttende kontaktkort — hvem kan jeg ringe? Bruk én gang nederst i
+   dokumentet, gjerne over RSVP eller footer. */
+.contact-card {
+  background: var(--blue-light);
+  border: 1px solid var(--blue);
+  border-radius: 4px;
+  padding: 2rem 2rem 1.7rem;
+  margin: 2rem 0 1rem;
+}
+.contact-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 0.7rem;
+}
+.contact-name {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.2rem;
+}
+.contact-role {
+  font-size: 0.95rem;
+  color: var(--ink-mid);
+  margin-bottom: 1rem;
+}
+.contact-detail {
+  font-size: 0.92rem;
+  color: var(--ink);
+  margin-bottom: 0.25rem;
+}
+.contact-detail a {
+  color: var(--blue);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+.contact-detail a:hover { border-bottom-color: var(--blue); }
+
+/* ── PARTNER PANEL (sentrert hvitt panel med radial-glow) ── */
+/* Bruk i invitasjoner og samarbeidsannonser når en partner / samarbeids-
+   organisasjon skal løftes fram. Subtil radial-glow gir varme uten å
+   bryte med 1-pikselslinje-estetikken. */
+.partner {
+  max-width: var(--container);
+  margin: 2.5rem auto 0;
+  padding: 0 2rem;
+}
+.partner-inner {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 2.8rem 2.5rem 2.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.partner-inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(217,119,87,0.06) 0%, transparent 55%),
+    radial-gradient(circle at 80% 100%, rgba(43,92,150,0.05) 0%, transparent 55%);
+  pointer-events: none;
+}
+.partner-inner > * { position: relative; }
+.partner-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 1rem;
+}
+.partner-title {
+  font-family: var(--font-serif);
+  font-size: 1.7rem;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.25;
+  letter-spacing: -0.3px;
+  margin-bottom: 0.9rem;
+}
+.partner-title .partner-italic {
+  font-style: italic;
+  font-weight: 600;
+  color: var(--blue);
+}
+.partner-desc {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--ink-mid);
+  max-width: 560px;
+  margin: 0 auto 2.2rem;
+}
+.partner-lockup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.2rem;
+  flex-wrap: wrap;
+}
+.partner-lockup img { display: block; height: 26px; width: auto; }
+.partner-lockup .partner-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--line);
+  display: block;
+}
+
+/* ── RSVP (call-to-action med knapp og QR) ── */
+/* Eksklusivt for invitasjoner: påmeldingsblokk med stor italic-tittel,
+   beskjed, knapp og evt. QR-kode. Plasseres mot slutten, før footer. */
+.rsvp {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 3.5rem 2rem 4rem;
+  text-align: center;
+}
+.rsvp-title {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--ink);
+  margin-bottom: 0.8rem;
+  letter-spacing: -0.3px;
+}
+.rsvp p {
+  font-size: 1rem;
+  color: var(--ink-mid);
+  max-width: 520px;
+  margin: 0 auto 2rem;
+  line-height: 1.65;
+}
+.rsvp-deadline {
+  font-weight: 600;
+  color: var(--blue);
+}
+.rsvp-btn {
+  display: inline-block;
+  background: var(--blue);
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.9rem 2rem;
+  border-radius: 4px;
+  transition: background 0.2s;
+  letter-spacing: 0.01em;
+}
+.rsvp-btn:hover { background: var(--blue-dark); }
+.rsvp-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.8rem;
+  flex-wrap: wrap;
+}
+.rsvp-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+}
+.rsvp-url-inline {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+.rsvp-or-vert {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-weight: 700;
+  padding: 0 0.4rem;
+  position: relative;
+}
+.rsvp-or-vert::before, .rsvp-or-vert::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 1px;
+  background: var(--line);
+  height: 32px;
+}
+.rsvp-or-vert::before { top: 0; transform: translate(-50%, -100%); }
+.rsvp-or-vert::after { bottom: 0; transform: translate(-50%, 100%); }
+.rsvp-qr-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+}
+.rsvp-qr {
+  display: inline-block;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px;
+}
+.rsvp-qr img { display: block; width: 130px; height: 130px; }
+.rsvp-qr-caption {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+/* ── FOOTER ── */
+/* Avsluttende meta-stripe — kontakt, copyright, lenker til relaterte sider. */
+footer {
+  border-top: 1px solid var(--line);
+  padding: 2rem;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  background: var(--bg);
+  margin-top: 2rem;
+}
+/* Resett av globalt p-stil — footer er kompakt og bør ikke ha margin-bottom. */
+footer p { margin-bottom: 0; font-size: inherit; color: inherit; line-height: inherit; }
+footer a {
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+}
+footer a:hover { color: var(--blue); }
+
+/* ── RESPONSIVT (< 680 px) ── */
+@media (max-width: 680px) {
+  .hero { padding: 3.5rem 1.5rem 2.5rem; }
+  .hero h1 { font-size: 2.2rem; }
+  .hero-subtitle { font-size: 1.1rem; }
+  .hero-ingress { font-size: 1rem; }
+  .facts {
+    grid-template-columns: 1fr;
+    gap: 1.3rem;
+    padding: 2rem 1.5rem;
+  }
+  .content { padding: 3rem 1.5rem 1.5rem; }
+  .section-title { font-size: 1.6rem; }
+  .deftable { grid-template-columns: 1fr; }
+  .tracks { grid-template-columns: 1fr; }
+  .examples { grid-template-columns: 1fr; }
+  .agenda-row { grid-template-columns: 1fr; gap: 0.3rem; padding: 1.2rem 0; }
+  .agenda-time { font-size: 1rem; }
+  .nav-wrap { padding: 0 1.5rem; gap: 1rem; }
+  .nav-meta { font-size: 0.65rem; }
+  .rate-row { grid-template-columns: 1fr; gap: 0.3rem; }
+  .datatable-row,
+  .datatable.is-2col .datatable-row { grid-template-columns: 1fr; gap: 0.4rem; }
+  .datatable-row.is-head { display: none; }
+  .hyp { grid-template-columns: 1fr; gap: 0.4rem; }
+  .pullquote { font-size: 1.1rem; padding: 1.4rem 1.4rem; }
+  .partner { padding: 0 1.5rem; }
+  .partner-inner { padding: 2rem 1.5rem; }
+  .partner-title { font-size: 1.35rem; }
+  .partner-desc { font-size: 0.9rem; }
+  .partner-lockup { gap: 1.4rem; }
+  .partner-lockup img { height: 22px; }
+  .partner-divider { height: 22px; }
+  .rsvp { padding: 2.5rem 1.5rem 3rem; }
+  .rsvp-title { font-size: 1.6rem; }
+}
+
+/* ── PRINT/PDF ── */
+/* @page-regelen sørger for at nettleserens egen "Print to PDF" matcher
+   Playwright-rendringens default (20mm rundt hele). break-inside-reglene
+   hindrer at kortkomponenter splittes over sidebrudd. Løftet ut av @media
+   print fordi @page bare aktiveres ved sideinndeling uansett — det gjør
+   regelen synlig også for verktøy som ikke evaluerer @media print.
+
+   Merk: når Playwright kjøres med sidetopp/-bunn (default), bruker den
+   25mm topp/bunn for å gi plass til disse. Browser-print har ikke noen
+   tilsvarende sidetopp/-bunn og bruker 20mm hele veien — det er bevisst. */
+@page {
+  size: A4;
+  margin: 20mm;
+}
+@media print {
+  body { background: var(--white); }
+  .hero { padding-top: 3rem; }
+  .section,
+  .scenario,
+  .hyp,
+  .callout,
+  .contact-card,
+  .pullquote,
+  .track,
+  .example,
+  .defcard,
+  .partner-inner { break-inside: avoid; page-break-inside: avoid; }
+  footer { margin-top: 1rem; }
+}
+
+
+/* ── Figurer (skisser) — bygger på designtokens, ingen nye farger ── */
+.figure{background:var(--white);border:1px solid var(--line);border-radius:4px;padding:18px 18px 14px;margin:22px 0}
+.figure svg{width:100%;height:auto;display:block}
+.figure-label{font-family:var(--font-sans);font-size:.65rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-bottom:12px}
+.figure-caption{margin-top:14px;padding-top:10px;border-top:1px solid var(--line);font-family:var(--font-sans);font-size:.84rem;line-height:1.6;color:var(--ink-soft)}
+.fig-lane{font-family:var(--font-sans);font-size:12px;font-weight:700;letter-spacing:.13em;fill:var(--ink-soft)}
+.fig-head{font-family:var(--font-sans);font-size:16px;font-weight:600;fill:var(--ink)}
+.fig-body{font-family:var(--font-sans);font-size:15px;fill:var(--ink-mid)}
+.fig-soft{font-family:var(--font-sans);font-size:15px;fill:var(--ink-soft)}
+.fig-sys{font-family:var(--font-sans);font-size:15px;font-weight:600;fill:var(--ink-soft)}
+.fig-numdot{font-family:var(--font-sans);font-size:13px;font-weight:700;fill:var(--blue)}
+.fig-legend{font-family:var(--font-sans);font-size:12px;fill:var(--ink-soft)}
+@media print{
+  .figure{break-inside:avoid}
+  /* A4-render havner under designsystemets 680px-breakpoint, som kollapser
+     flerkolonne-komponentene. Gjenopprett dem så PDF-en matcher nettversjonen. */
+  .facts{grid-template-columns:repeat(3,minmax(0,1fr));padding:2.2rem 2rem}
+  .scenarios{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .content{padding:2.4rem 1.5rem 1rem}
+  /* Designsystemet holder hele .section samlet på én side. I et dokument med
+     mange korte seksjoner gir det halvtomme sider — la seksjonene flyte, men
+     behold kort, figurer og overskrifter samlet. */
+  .section{break-inside:auto;page-break-inside:auto}
+  .section-kicker,.section-title,.subsection-title{break-after:avoid;page-break-after:avoid}
+}
+@media (max-width:640px){.figure{padding:18px 12px 14px}}
+</style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="nav-wrap">
+    <div class="logo-lockup">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAADgCAYAAAD7cAJBAAAFw2lUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNS41LjAiPgogPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIgogICAgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIgogICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICAgeG1sbnM6ZXhpZj0iaHR0cDovL25zLmFkb2JlLmNvbS9leGlmLzEuMC8iCiAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyIKICAgIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIgogICAgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIKICAgeG1wOkNyZWF0ZURhdGU9IjIwMjUtMDMtMDJUMjI6NDI6MTQrMDEwMCIKICAgeG1wOk1vZGlmeURhdGU9IjIwMjUtMDMtMDJUMjM6MTA6MTIrMDE6MDAiCiAgIHhtcDpNZXRhZGF0YURhdGU9IjIwMjUtMDMtMDJUMjM6MTA6MTIrMDE6MDAiCiAgIHBob3Rvc2hvcDpEYXRlQ3JlYXRlZD0iMjAyNS0wMy0wMlQyMjo0MjoxNCswMTAwIgogICBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIgogICBwaG90b3Nob3A6SUNDUHJvZmlsZT0ic1JHQiBJRUM2MTk2Ni0yLjEiCiAgIGV4aWY6UGl4ZWxYRGltZW5zaW9uPSI4MDAiCiAgIGV4aWY6UGl4ZWxZRGltZW5zaW9uPSIyMjQiCiAgIGV4aWY6Q29sb3JTcGFjZT0iMSIKICAgdGlmZjpJbWFnZVdpZHRoPSI4MDAiCiAgIHRpZmY6SW1hZ2VMZW5ndGg9IjIyNCIKICAgdGlmZjpSZXNvbHV0aW9uVW5pdD0iMiIKICAgdGlmZjpYUmVzb2x1dGlvbj0iMzAwLzEiCiAgIHRpZmY6WVJlc29sdXRpb249IjMwMC8xIj4KICAgPGRjOnRpdGxlPgogICAgPHJkZjpBbHQ+CiAgICAgPHJkZjpsaSB4bWw6bGFuZz0ieC1kZWZhdWx0Ij5jb21taXRfYmx1ZV9tZWRpdW08L3JkZjpsaT4KICAgIDwvcmRmOkFsdD4KICAgPC9kYzp0aXRsZT4KICAgPHhtcE1NOkhpc3Rvcnk+CiAgICA8cmRmOlNlcT4KICAgICA8cmRmOmxpCiAgICAgIHN0RXZ0OmFjdGlvbj0icHJvZHVjZWQiCiAgICAgIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFmZmluaXR5IERlc2lnbmVyIDIgMi41LjYiCiAgICAgIHN0RXZ0OndoZW49IjIwMjUtMDMtMDJUMjM6MTA6MTIrMDE6MDAiLz4KICAgIDwvcmRmOlNlcT4KICAgPC94bXBNTTpIaXN0b3J5PgogIDwvcmRmOkRlc2NyaXB0aW9uPgogPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KPD94cGFja2V0IGVuZD0iciI/PmZKvdYAAAGBaUNDUHNSR0IgSUVDNjE5NjYtMi4xAAAokXWR3yuDURjHP9toi2kKJblYGlebmBI3LrYYhYttynCzvfZDbfP2vltabpXbFSVu/LrgL+BWuVaKSMk1t8QNej2vqUn2nJ7zfM73nOfpnOeANZpVcnpdH+TyBS0cCrhnY3Nu+xM2rLTRgSOu6OpUZCxKTXu7wWLGK59Zq/a5f61xMakrYHEIjyiqVhAeF55cKagmbwq3Kpn4ovCxsFeTCwpfm3qiwo8mpyv8YbIWDQfB2izsTv/ixC9WMlpOWF6OJ5ctKj/3MV/iTOZnIhK7xDvRCRMigJsJRgkySD/DMg/iw0+vrKiR3/edP82y5Coyq5TQWCJNhgJeUYtSPSkxJXpSRpaS2f+/fdVTA/5KdWcA6h8M46Ub7BvwWTaM933D+DwA2z2c5av5y3sw9Cp6uap5dsG1BifnVS2xBafr0H6nxrX4t2QTt6ZS8HwETTFouYSG+UrPfvY5vIXoqnzVBWzvQI+cdy18AR60Z8WHKhTWAAAACXBIWXMAAC4jAAAuIwF4pT92AAAgAElEQVR4nO3dedznU93H8deYsUb2EKVDxY1krXRXWiVZTiKElhuphLtkKafucHJbukt3KUuyFbf90EIihBYylKgsnVFkmyEUhplx/3G+k2vGNTPX8j3nfH+/3/v5ePwe16S5zudzzW+5vp/vOedzQERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERETGylg/wVi/aO08REZqQu0ERERERGRkjPWLA28F3gm8BVgVWAFYGHgSmAr8GbgSuAK4IQY3q0qyIvOgAkRERESk44z1SwP7AJ8mFRwjdRvw38A5MbgZOXITGS0VICIiIiIdZqzfDvgusNw4hrkV2DkGd3s7WYmMnQqQgoz1E4BFgMWAZ4GnNS0qIiIiwzHWLwx8FfhUS0M+BewTgzu1pfFExkQFyDg1RcXKwJrAGs1jTWB1YCngRcCSzdcXARPnGuIZ4GnSh8Lsrw8B9w3zmALcH4N7LufPJCIiInUZ6xcCTgd2yzD8XjG472QYV2REVICMkrF+NeBNzePfgbWAxQumMBW4GZjcfL0ZuEszKSIiIv3DWP9V0n6PHGYBO8TgLso0vsh8qQBZAGP9qsA2PF90rF43o2E9BvwE+BFwaQzu4cr5iIiIyBgZ6zcHrs4cZhrw6hjcI5njiLyACpBhGOtXBHYAdgbeTG/9Oz0H/JpUjJwVg/tz5XxE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" alt="Commit" class="logo-img" />
+    </div>
+    <div class="nav-meta">Tjenestebeskrivelse</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">Tjeneste · AI-rådgivning</div>
+  <h1>Lønnskjøringen som ble <span class="italic">15 minutter</span></h1>
+  <p class="hero-ingress">
+    Commit kjører sin egen lønn sammen med Claude. Slik ser det ut — og slik hjelper vi
+    dere med å gjøre det samme.
+  </p>
+</section>
+
+<section class="facts">
+  <div>
+    <div class="fact-label">Før</div>
+    <div class="fact-value">4–5 timer</div>
+    <div class="fact-sub">menneskearbeid, per kjøring</div>
+  </div>
+  <div>
+    <div class="fact-label">Nå</div>
+    <div class="fact-value">15 minutter</div>
+    <div class="fact-sub">kvalitetskontroll og sparring</div>
+  </div>
+  <div>
+    <div class="fact-label">Maskintid</div>
+    <div class="fact-value">40 minutter</div>
+    <div class="fact-sub">mens vi gjør noe annet</div>
+  </div>
+</section>
+
+<section class="content">
+
+  <div class="section">
+    <div class="section-kicker"><span class="section-num">01</span> Caset</div>
+    <h2 class="section-title">En jobb som må stemme til øret</h2>
+    <p>
+      Lønnskjøring er ikke vanskelig arbeid. Det er presist arbeid, og det er mye av det:
+      omsetning per konsulent hentes ut av Tripletex bilag for bilag, så kommer
+      fellesbidrag, prosjektresultat, fastlønn og honorar — alt inn i et regneark der
+      formateringen ikke tåler å bli skrevet om. Bommer du på ett tall, oppdager du det
+      når noen mangler penger på konto.
+    </p>
+
+    <div class="figure">
+      <div class="figure-label">Skisse 1 · Lønnskjøringen, steg for steg</div>
+      <svg viewBox="0 0 820 566" role="img" aria-label="Lonnskjoringen steg for steg fordelt paa menneske, Claude og systemer">
+<defs><marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7"
+   orient="auto-start-reverse"><path d="M0,1 L7,4 L0,7 z" fill="#2B5C96"/></marker></defs>
+<text class="fig-lane" x="46" y="20">MENNESKE</text>
+<text class="fig-lane" x="310" y="20">CLAUDE</text>
+<text class="fig-lane" x="626" y="20">SYSTEMER</text>
+<line x1="0" y1="28" x2="820" y2="28" stroke="#E0DDD6" stroke-width="1"/>
+<line x1="14" y1="40" x2="14" y2="520" stroke="#E0DDD6" stroke-width="1"/>
+<circle cx="14" cy="80" r="13" fill="#FFFFFF" stroke="#E0DDD6" stroke-width="1"/>
+<text class="fig-numdot" x="14" y="85" text-anchor="middle">1</text>
+<circle cx="14" cy="180" r="13" fill="#FFFFFF" stroke="#E0DDD6" stroke-width="1"/>
+<text class="fig-numdot" x="14" y="185" text-anchor="middle">2</text>
+<circle cx="14" cy="280" r="13" fill="#FFFFFF" stroke="#E0DDD6" stroke-width="1"/>
+<text class="fig-numdot" x="14" y="285" text-anchor="middle">3</text>
+<circle cx="14" cy="380" r="13" fill="#FFFFFF" stroke="#E0DDD6" stroke-width="1"/>
+<text class="fig-numdot" x="14" y="385" text-anchor="middle">4</text>
+<circle cx="14" cy="480" r="13" fill="#FFFFFF" stroke="#E0DDD6" stroke-width="1"/>
+<text class="fig-numdot" x="14" y="485" text-anchor="middle">5</text>
+<rect x="46" y="40" width="228" height="80" rx="4" fill="#EBF1F9" stroke="#2B5C96" stroke-width="1.6"/>
+<text class="fig-body" x="62" y="59" text-anchor="start">Bekrefter at fakturering,</text>
+<text class="fig-body" x="62" y="80" text-anchor="start">utlegg og ansattliste</text>
+<text class="fig-body" x="62" y="101" text-anchor="start">er klare</text>
+<rect x="46" y="440" width="228" height="80" rx="4" fill="#EBF1F9" stroke="#2B5C96" stroke-width="1.6"/>
+<text class="fig-body" x="62" y="472" text-anchor="start">Leser gjennom avvikene</text>
+<text class="fig-body" x="62" y="493" text-anchor="start">og godkjenner</text>
+<rect x="46" y="140" width="228" height="280" rx="4" fill="none" stroke="#E0DDD6" stroke-width="1" stroke-dasharray="4 4"/>
+<text class="fig-soft" x="160" y="272" text-anchor="middle">mennesket jobber</text>
+<text class="fig-soft" x="160" y="293" text-anchor="middle">med noe annet</text>
+<rect x="310" y="140" width="280" height="80" rx="4" fill="#FFFFFF" stroke="#2B5C96" stroke-width="1"/>
+<text class="fig-body" x="326" y="172" text-anchor="start">Henter omsetning per konsulent,</text>
+<text class="fig-body" x="326" y="193" text-anchor="start">postering for postering</text>
+<rect x="310" y="240" width="280" height="80" rx="4" fill="#FFFFFF" stroke="#2B5C96" stroke-width="1"/>
+<text class="fig-body" x="326" y="272" text-anchor="start">Fellesbidrag, prosjektresultat,</text>
+<text class="fig-body" x="326" y="293" text-anchor="start">fastlønn og honorar inn i arket</text>
+<rect x="310" y="340" width="280" height="80" rx="4" fill="#FFFFFF" stroke="#2B5C96" stroke-width="1"/>
+<text class="fig-body" x="326" y="372" text-anchor="start">Kontrollerer summene og</text>
+<text class="fig-body" x="326" y="393" text-anchor="start">samler alle avvik</text>
+<rect x="310" y="440" width="280" height="80" rx="4" fill="#FFFFFF" stroke="#2B5C96" stroke-width="1"/>
+<text class="fig-body" x="326" y="472" text-anchor="start">Legger fram avvik og utkast</text>
+<text class="fig-body" x="326" y="493" text-anchor="start">til e-post til lønnsbyrået</text>
+<rect x="626" y="161" width="98" height="38" rx="19" fill="#FAFAF7" stroke="#E0DDD6" stroke-width="1"/>
+<text class="fig-sys" x="675" y="186" text-anchor="middle">Tripletex</text>
+<line x1="590" y1="180" x2="622" y2="180" stroke="#E0DDD6" stroke-width="1" stroke-dasharray="3 3"/>
+<rect x="626" y="261" width="152" height="38" rx="19" fill="#FAFAF7" stroke="#E0DDD6" stroke-width="1"/>
+<text class="fig-sys" x="702" y="286" text-anchor="middle">Tripletex · Excel</text>
+<line x1="590" y1="280" x2="622" y2="280" stroke="#E0DDD6" stroke-width="1" stroke-dasharray="3 3"/>
+<rect x="626" y="361" width="72" height="38" rx="19" fill="#FAFAF7" stroke="#E0DDD6" stroke-width="1"/>
+<text class="fig-sys" x="662" y="386" text-anchor="middle">Excel</text>
+<line x1="590" y1="380" x2="622" y2="380" stroke="#E0DDD6" stroke-width="1" stroke-dasharray="3 3"/>
+<rect x="626" y="461" width="88" height="38" rx="19" fill="#FAFAF7" stroke="#E0DDD6" stroke-width="1"/>
+<text class="fig-sys" x="670" y="486" text-anchor="middle">Outlook</text>
+<line x1="590" y1="480" x2="622" y2="480" stroke="#E0DDD6" stroke-width="1" stroke-dasharray="3 3"/>
+<path d="M160,120 L160,130 L450,130 L450,136" fill="none" stroke="#2B5C96" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M450,224 L450,236" fill="none" stroke="#2B5C96" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M450,324 L450,336" fill="none" stroke="#2B5C96" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M450,424 L450,436" fill="none" stroke="#2B5C96" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M310,480 L280,480" fill="none" stroke="#2B5C96" stroke-width="1.3" marker-end="url(#ar)"/>
+<rect x="46" y="533" width="13" height="13" rx="2" fill="#EBF1F9" stroke="#2B5C96" stroke-width="1.6"/>
+<text class="fig-legend" x="66" y="544">Menneskelig kontrollpunkt</text>
+<rect x="300" y="533" width="13" height="13" rx="2" fill="#FFFFFF" stroke="#2B5C96" stroke-width="1"/>
+<text class="fig-legend" x="320" y="544">Claude arbeider</text>
+<rect x="500" y="533" width="13" height="13" rx="2" fill="#FAFAF7" stroke="#E0DDD6" stroke-width="1"/>
+<text class="fig-legend" x="520" y="544">Fagsystemene deres</text>
+</svg>
+      <div class="figure-caption">
+        Mennesket bekrefter forutsetningene før start og godkjenner alt som skal ut før det
+        går ut. Imellom kjører prosessen selv.
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Den viktige detaljen</div>
+      <p>
+        De 40 minuttene er ikke ventetid — de går mens vi gjør noe annet. Regnestykket er
+        derfor ikke «fire timer ble til én», men
+        <strong>fire til fem timer menneskearbeid ble til et kvarter</strong>.
+      </p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-kicker"><span class="section-num">02</span> Ikke en chatbot</div>
+    <h2 class="section-title">Claude jobber inne i systemene deres</h2>
+    <p>
+      Stiller du spørsmål i et chattevindu og limer svaret inn et annet sted, har du bare
+      flyttet klikkingen. Utslaget kommer først når modellen leser og skriver i systemene
+      selv, gjennom deres egne grensesnitt.
+    </p>
+
+    <div class="figure">
+      <div class="figure-label">Skisse 2 · Der Claude er koblet på hos oss</div>
+      <svg viewBox="0 0 820 350" role="img" aria-label="Integrasjonskart: Claude koblet til Tripletex, Cinode, regneark, Microsoft 365, Teams, Discord, Doffin og Mercell">
+<line x1="245" y1="62" x2="245" y2="298" stroke="#E0DDD6" stroke-width="1"/>
+<line x1="575" y1="62" x2="575" y2="298" stroke="#E0DDD6" stroke-width="1"/>
+<line x1="220" y1="62" x2="245" y2="62" stroke="#E0DDD6" stroke-width="1"/>
+<line x1="600" y1="62" x2="575" y2="62" stroke="#E0DDD6" stroke-width="1"/>
+<line x1="220" y1="180" x2="245" y2="180" stroke="#E0DDD6" stroke-width="1"/>
+<line x1="600" y1="180" x2="575" y2="180" stroke="#E0DDD6" stroke-width="1"/>
+<line x1="220" y1="298" x2="245" y2="298" stroke="#E0DDD6" stroke-width="1"/>
+<line x1="600" y1="298" x2="575" y2="298" stroke="#E0DDD6" stroke-width="1"/>
+<line x1="245" y1="180" x2="288" y2="180" stroke="#2B5C96" stroke-width="1.3"/>
+<line x1="532" y1="180" x2="575" y2="180" stroke="#2B5C96" stroke-width="1.3"/>
+<rect x="0" y="24" width="220" height="76" rx="4" fill="#FFFFFF" stroke="#E0DDD6" stroke-width="1"/>
+<text class="fig-head" x="16" y="56">Tripletex</text>
+<text class="fig-soft" x="16" y="80">Regnskap, faktura og lønn</text>
+<rect x="0" y="142" width="220" height="76" rx="4" fill="#FFFFFF" stroke="#E0DDD6" stroke-width="1"/>
+<text class="fig-head" x="16" y="174">Cinode</text>
+<text class="fig-soft" x="16" y="198">CV-er og bemanning</text>
+<rect x="0" y="260" width="220" height="76" rx="4" fill="#FFFFFF" stroke="#E0DDD6" stroke-width="1"/>
+<text class="fig-head" x="16" y="292">Regnearket</text>
+<text class="fig-soft" x="16" y="316">Lønnsark og beregninger</text>
+<rect x="600" y="24" width="220" height="76" rx="4" fill="#FFFFFF" stroke="#E0DDD6" stroke-width="1"/>
+<text class="fig-head" x="616" y="56">Microsoft 365</text>
+<text class="fig-soft" x="616" y="80">E-post, kalender og filer</text>
+<rect x="600" y="142" width="220" height="76" rx="4" fill="#FFFFFF" stroke="#E0DDD6" stroke-width="1"/>
+<text class="fig-head" x="616" y="174">Teams og Discord</text>
+<text class="fig-soft" x="616" y="198">Varsling og dialog</text>
+<rect x="600" y="260" width="220" height="76" rx="4" fill="#FFFFFF" stroke="#E0DDD6" stroke-width="1"/>
+<text class="fig-head" x="616" y="292">Doffin og Mercell</text>
+<text class="fig-soft" x="616" y="316">Anbud, tilbud og frister</text>
+<rect x="290" y="125" width="240" height="110" rx="4" fill="#FFFFFF" stroke="#2B5C96" stroke-width="1.6"/>
+<text x="410" y="173" text-anchor="middle" font-family="Lora, Georgia, serif" font-style="italic" font-size="30" fill="#2B5C96">Claude</text>
+<text class="fig-soft" x="410" y="199" text-anchor="middle">arbeider i systemene,</text>
+<text class="fig-soft" x="410" y="219" text-anchor="middle">ikke ved siden av dem</text>
+</svg>
+      <div class="figure-caption">
+        Ingen ny portal å logge seg inn i, ingen mellomlagring i et sidesystem, og ingen ny
+        leverandør mellom dere og fagsystemene deres.
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-kicker"><span class="section-num">03</span> Hvor tiden ble av</div>
+    <h2 class="section-title">Fagarbeidet forsvant ikke — klikkingen gjorde det</h2>
+
+    <div class="figure">
+      <div class="figure-label">Skisse 3 · Én lønnskjøring, før og nå</div>
+      <svg viewBox="0 0 820 292" role="img" aria-label="Tidsbruk foer og naa: 4-5 timer menneskearbeid mot 40 minutter maskintid og 15 minutter menneskelig kontroll">
+<text class="fig-lane" x="0" y="14">FØR</text>
+<text class="fig-soft" x="62" y="14">4–5 timer menneskearbeid, hver eneste måned</text>
+<rect x="0" y="26" width="820" height="52" rx="3" fill="#EBF1F9" stroke="#2B5C96" stroke-width="1"/>
+<text class="fig-body" x="18" y="58">Hente tall · føre inn i arket · beregne · kontrollere · sende bekreftelse</text>
+<text class="fig-lane" x="0" y="116">NÅ · MASKINEN</text>
+<text class="fig-soft" x="152" y="116">Claude arbeider på egen hånd</text>
+<rect x="0" y="128" width="121" height="52" rx="3" fill="#FAFAF7" stroke="#2B5C96" stroke-width="1.2" stroke-dasharray="5 3"/>
+<text class="fig-body" x="60" y="160" text-anchor="middle" fill="#2B5C96">40 min</text>
+<rect x="129" y="128" width="691" height="52" rx="3" fill="none" stroke="#E0DDD6" stroke-width="1" stroke-dasharray="4 4"/>
+<text class="fig-soft" x="474" y="160" text-anchor="middle">mennesket jobber med noe annet imens</text>
+<text class="fig-lane" x="0" y="218">NÅ · MENNESKET</text>
+<text class="fig-soft" x="162" y="218">15 minutter kvalitetskontroll og sparring</text>
+<rect x="121" y="230" width="46" height="52" rx="3" fill="#2B5C96"/>
+<rect x="175" y="230" width="645" height="52" rx="3" fill="none" stroke="#E0DDD6" stroke-width="1" stroke-dasharray="4 4"/>
+<text class="fig-soft" x="497" y="262" text-anchor="middle">tid som før gikk til klikking og dataflytting</text>
+</svg>
+      <div class="figure-caption">
+        Skalaen er den samme i alle tre radene.
+      </div>
+    </div>
+
+    <p>
+      Poenget som overrasker mest: <strong>behovet for fagkompetanse ble ikke mindre, det
+      ble mer intenst.</strong> Når tallene foreligger etter et kvarter i stedet for en halv
+      dag, går tiden til å faktisk se på dem. Den som kan lønn er ikke overflødig — hun er
+      mer verdt, fordi kompetansen brukes på vurdering i stedet for dataregistrering.
+    </p>
+  </div>
+
+  <div class="section">
+    <div class="section-kicker"><span class="section-num">04</span> Forskjellen</div>
+    <h2 class="section-title">Fire ting vanlig automatisering ikke gjør</h2>
+    <div class="scenarios">
+      <div class="scenario">
+        <div class="scenario-label">Én</div>
+        <div class="scenario-title">Kompetansen blir mer verdt</div>
+        <div class="scenario-body">Vi trenger ikke færre folk som kan faget — vi trenger
+          dem på vurderingene i stedet for på dataregistreringen.</div>
+      </div>
+      <div class="scenario">
+        <div class="scenario-label">To</div>
+        <div class="scenario-title">En motpart, ikke et skript</div>
+        <div class="scenario-body">Claude ser sammenhenger på tvers og har fanget avvik vi
+          selv hadde gått glipp av.</div>
+      </div>
+      <div class="scenario">
+        <div class="scenario-label">Tre</div>
+        <div class="scenario-title">Tåler at ting endrer seg</div>
+        <div class="scenario-body">Ny ansatt, ny konto, et spesialtilfelle ingen forutså:
+          du forklarer det på norsk. Ingen endringsbestilling.</div>
+      </div>
+      <div class="scenario">
+        <div class="scenario-label">Fire</div>
+        <div class="scenario-title">Blir bedre for hver kjøring</div>
+        <div class="scenario-body">Unntak vi støter på skrives inn i prosessen. Et skript
+          står stille; dette akkumulerer.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-kicker"><span class="section-num">05</span> Kontroll</div>
+    <h2 class="section-title">Mennesket har siste ord, hver gang</h2>
+    <ul class="pitfalls">
+      <li><strong>Ingenting går ut uten godkjenning.</strong> Claude lager utkastet til
+        lønnsbyrået. Et menneske leser det og trykker send.</li>
+      <li><strong>Avvik stopper ikke kjøringen — de samles opp.</strong> Alt som ser rart
+        ut legges fram samlet til slutt, i stedet for som seks avbrytelser.</li>
+      <li><strong>Prosessen er skrevet ned og lesbar.</strong> Den ligger som tekst dere
+        eier og kan endre selv. Ingen svart boks, ingen innelåsing hos oss.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="partner">
+  <div class="partner-inner">
+    <div class="partner-label">Partner</div>
+    <div class="partner-title">Commit er offisiell <span class="partner-italic">Anthropic Partner</span></div>
+    <div class="partner-desc">
+      Vi selger ikke noe vi ikke bruker selv. Samme framgangsmåte kjører nå
+      tilbudsproduksjon, avtaler, bemanning, anbudsovervåking og timeoppfølging hos oss.
+    </div>
+    <div class="partner-lockup">
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDI0LjIiIGhlaWdodD0iMTE1IiB2aWV3Qm94PSIwIDAgMTAyNC4yIDExNSI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6IzFmMWYxZTt9PC9zdHlsZT48L2RlZnM+PHBhdGggY2xhc3M9ImEiIGQ9Ik0yNTAuNjQ5LDIzLjM0OTRoMzcuMzI4VjExMy4wOTRoMjMuODI1VjIzLjM0OTRIMzQ5LjEzVjEuOTA2MUgyNTAuNjQ5WiIvPjxwYXRoIGNsYXNzPSJhIiBkPSJNMjA4LjU1Nyw3OS43Mzc2LDE1OC41MjIsMS45MDYxSDEzMS41MTlWMTEzLjA5NGgyMy4wMzJWMzUuMjYyNGw1MC4wMzUsNzcuODMxNmgyNy4wMDJWMS45MDYxSDIwOC41NTdaIi8+PHBhdGggY2xhc3M9ImEiIGQ9Ik00NDQuNDM0LDQ2LjIyMjRIMzkyLjAxN1YxLjkwNjFIMzY4LjE5MVYxMTMuMDk0aDIzLjgyNlY2Ny42NjU3aDUyLjQxN1YxMTMuMDk0SDQ2OC4yNlYxLjkwNjFINDQ0LjQzNFoiLz48cGF0aCBjbGFzcz0iYSIgZD0iTTQ0LjMxNjMsMS45MDYxLDAsMTEzLjA5NEgyNC43NzlsOS4wNjM0LTIzLjM0OTVIODAuMjA2MUw4OS4yNjgsMTEzLjA5NGgyNC43NzlMNjkuNzMwNywxLjkwNjFaTTQxLjg1NzUsNjkuMDk1M2wxNS4xNjYtMzkuMDc0Nkw3Mi4xOSw2OS4wOTUzWiIvPjxwYXRoIGNsYXNzPSJhIiBkPSJNNjY1LjY5OCwwYy0zMi4wODYsMC01NC44LDIzLjgyNi01NC44LDU3LjY1ODgsMCwzMy41MTUyLDIyLjcxNCw1Ny4zNDEyLDU0LjgsNTcuMzQxMiwzMS45MjYsMCw1NC40ODItMjMuODI2LDU0LjQ4Mi01Ny4zNDEyQzcyMC4xOCwyMy44MjYsNjk3LjYyNCwwLDY2NS42OTgsMFptMCw5Mi43NjI0Yy0xOC43NDQsMC0zMC4xOC0xMy4zNDI1LTMwLjE4LTM1LjEwMzYsMC0yMi4wNzg3LDExLjQzNi0zNS40MjEyLDMwLjE4LTM1LjQyMTIsMTguNTg0LDAsMjkuODYxLDEzLjM0MjUsMjkuODYxLDM1LjQyMTJDNjk1LjU1OSw3OS40Miw2ODQuMjgyLDkyLjc2MjQsNjY1LjY5OCw5Mi43NjI0WiIvPjxwYXRoIGNsYXNzPSJhIiBkPSJNOTk4Ljc4NSw3NS43NjY2Yy00LjEzLDEwLjgwMTEtMTIuMzksMTYuOTk1OC0yMy42NjgsMTYuOTk1OC0xOC43NDMsMC0zMC4xNzktMTMuMzQyNS0zMC4xNzktMzUuMTAzNiwwLTIyLjA3ODcsMTEuNDM2LTM1LjQyMTIsMzAuMTc5LTM1LjQyMTIsMTEuMjc4LDAsMTkuNTM4LDYuMTk0NywyMy42NjgsMTYuOTk1OGgyNS4yNTVDMTAxNy44NSwxNS40MDc1LDk5OS4yNjEsMCw5NzUuMTE3LDBjLTMyLjA4NSwwLTU0Ljc5OSwyMy44MjYtNTQuNzk5LDU3LjY1ODhDOTIwLjMxOCw5MS4xNzQsOTQzLjAzMiwxMTUsOTc1LjExNywxMTUsOTk5LjQyLDExNSwxMDE4LDk5LjQzMzcsMTAyNC4yLDc1Ljc2NjZaIi8+PHBhdGggY2xhc3M9ImEiIGQ9Ik04NDYuOTM0LDEuOTA2MSw4OTEuMjUsMTEzLjA5NGgyNC4zMDJMODcxLjIzNiwxLjkwNjFaIi8+PHBhdGggY2xhc3M9ImEiIGQ9Ik03OTYuNzQsMS45MDYxSDc0Mi40MTdWMTEzLjA5NGgyMy44MjZWNzIuNzQ4Nkg3OTYuNzRjMjUuMjU2LDAsNDAuNjYzLTEzLjM0MjUsNDAuNjYzLTM1LjQyMTNTODIxLjk5NiwxLjkwNjEsNzk2Ljc0LDEuOTA2MVptLTEuMTEyLDQ5LjM5OTFINzY2LjI0M1YyMy4zNDk0aDI5LjM4NWMxMS43NTUsMCwxNy45NDksNC43NjUyLDE3Ljk0OSwxMy45Nzc5UzgwNy4zODMsNTEuMzA1Miw3OTUuNjI4LDUxLjMwNTJaIi8+PHBhdGggY2xhc3M9ImEiIGQ9Ik01OTIuNjMxLDM1LjczODljMC0yMC45NjY4LTE1LjQwNy0zMy44MzI4LTQwLjY2My0zMy44MzI4SDQ5Ny42NDVWMTEzLjA5NGgyMy44MjZWNjkuNTcxOGgyNi41MjVsMjMuODI3LDQzLjUyMjJoMjYuMzY4TDU3MS44MDcsNjYuMjU2OEM1ODUuMDUsNjEuMTY2LDU5Mi42MzEsNTAuNDQ1OSw1OTIuNjMxLDM1LjczODlabS03MS4xNi0xMi4zOWgyOS4zODVjMTEuNzU0LDAsMTcuOTQ5LDQuMjg4NywxNy45NDksMTIuMzlzLTYuMTk1LDEyLjM5LTE3Ljk0OSwxMi4zOUg1MjEuNDcxWiIvPjwvc3ZnPg==" alt="Anthropic" />
+      <span class="partner-divider"></span>
+      <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgaWQ9ImthdG1hbl8xIgogICBkYXRhLW5hbWU9ImthdG1hbiAxIgogICB2ZXJzaW9uPSIxLjEiCiAgIHZpZXdCb3g9IjAgMCA2ODkuOTc5OTcgMTQ4LjE3OTk5IgogICBzb2RpcG9kaTpkb2NuYW1lPSJDbGF1ZGVfQWkuc3ZnIgogICB3aWR0aD0iNjg5Ljk3OTk4IgogICBoZWlnaHQ9IjE0OC4xNzk5OSIKICAgaW5rc2NhcGU6dmVyc2lvbj0iMS4yLjIgKDczMmEwMWRhNjMsIDIwMjItMTItMDkpIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBpZD0ibmFtZWR2aWV3MTUyIgogICAgIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIKICAgICBib3JkZXJjb2xvcj0iIzAwMDAwMCIKICAgICBib3JkZXJvcGFjaXR5PSIwLjI1IgogICAgIGlua3NjYXBlOnNob3dwYWdlc2hhZG93PSIyIgogICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwLjAiCiAgICAgaW5rc2NhcGU6cGFnZWNoZWNrZXJib2FyZD0iMCIKICAgICBpbmtzY2FwZTpkZXNrY29sb3I9IiNkMWQxZDEiCiAgICAgc2hvd2dyaWQ9ImZhbHNlIgogICAgIGlua3NjYXBlOnpvb209IjEuMzA4NjI3OSIKICAgICBpbmtzY2FwZTpjeD0iMzQ1LjM5OTk1IgogICAgIGlua3NjYXBlOmN5PSI3My43NDEzNjEiCiAgICAgaW5rc2NhcGU6d2luZG93LXdpZHRoPSIxOTIwIgogICAgIGlua3NjYXBlOndpbmRvdy1oZWlnaHQ9Ijk5MSIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iLTkiCiAgICAgaW5rc2NhcGU6d2luZG93LXk9Ii05IgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjEiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ia2F0bWFuXzEiIC8+CiAgPGRlZnMKICAgICBpZD0iZGVmczE0NSI+CiAgICA8c3R5bGUKICAgICAgIGlkPSJzdHlsZTE0MyI+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogIzBmMGYwZDsKICAgICAgfQoKICAgICAgLmNscy0xLCAuY2xzLTIgewogICAgICAgIHN0cm9rZS13aWR0aDogMHB4OwogICAgICB9CgogICAgICAuY2xzLTIgewogICAgICAgIGZpbGw6ICNkOTc3NTc7CiAgICAgIH0KICAgIDwvc3R5bGU+CiAgPC9kZWZzPgogIDxnCiAgICAgaWQ9ImczMTQiCiAgICAgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTc1Ljk2LC0yMjMuNTMpIj4KICAgIDxwYXRoCiAgICAgICBjbGFzcz0iY2xzLTIiCiAgICAgICBkPSJtIDEwNS4wMSwzMjIuMDcgMjkuMTQsLTE2LjM1IDAuNDksLTEuNDIgLTAuNDksLTAuNzkgaCAtMS40MiBsIC00Ljg3LC0wLjMgLTE2LjY1LC0wLjQ1IC0xNC40NCwtMC42IC0xMy45OSwtMC43NSAtMy41MiwtMC43NSAtMy4zLC00LjM1IDAuMzQsLTIuMTcgMi45NiwtMS45OSA0LjI0LDAuMzcgOS4zNywwLjY0IDE0LjA2LDAuOTcgMTAuMiwwLjYgMTUuMTEsMS41NyBoIDIuNCBsIDAuMzQsLTAuOTcgLTAuODIsLTAuNiAtMC42NCwtMC42IC0xNC41NSwtOS44NiAtMTUuNzUsLTEwLjQyIC04LjI1LC02IC00LjQ2LC0zLjA0IC0yLjI1LC0yLjg1IC0wLjk3LC02LjIyIDQuMDUsLTQuNDYgNS40NCwwLjM3IDEuMzksMC4zNyA1LjUxLDQuMjQgMTEuNzcsOS4xMSAxNS4zNywxMS4zMiAyLjI1LDEuODcgMC45LC0wLjY0IDAuMTEsLTAuNDUgLTEuMDEsLTEuNjkgLTguMzYsLTE1LjExIC04LjkyLC0xNS4zNyAtMy45NywtNi4zNyAtMS4wNSwtMy44MiBjIC0wLjM3LC0xLjU3IC0wLjY0LC0yLjg5IC0wLjY0LC00LjUgbCA0LjYxLC02LjI2IDIuNTUsLTAuODIgNi4xNSwwLjgyIDIuNTksMi4yNSAzLjgyLDguNzQgNi4xOSwxMy43NiA5LjYsMTguNzEgMi44MSw1LjU1IDEuNSw1LjE0IDAuNTYsMS41NyBoIDAuOTcgdiAtMC45IGwgMC43OSwtMTAuNTQgMS40NiwtMTIuOTQgMS40MiwtMTYuNjUgMC40OSwtNC42OSAyLjMyLC01LjYyIDQuNjEsLTMuMDQgMy42LDEuNzIgMi45Niw0LjI0IC0wLjQxLDIuNzQgLTEuNzYsMTEuNDQgLTMuNDUsMTcuOTIgLTIuMjUsMTIgaCAxLjMxIGwgMS41LC0xLjUgNi4wNywtOC4wNiAxMC4yLC0xMi43NSA0LjUsLTUuMDYgNS4yNSwtNS41OSAzLjM3LC0yLjY2IGggNi4zNyBsIDQuNjksNi45NyAtMi4xLDcuMiAtNi41Niw4LjMyIC01LjQ0LDcuMDUgLTcuOCwxMC41IC00Ljg3LDguNCAwLjQ1LDAuNjcgMS4xNiwtMC4xMSAxNy42MiwtMy43NSA5LjUyLC0xLjcyIDExLjM2LC0xLjk1IDUuMTQsMi40IDAuNTYsMi40NCAtMi4wMiw0Ljk5IC0xMi4xNSwzIC0xNC4yNSwyLjg1IC0yMS4yMiw1LjAyIC0wLjI2LDAuMTkgMC4zLDAuMzcgOS41NiwwLjkgNC4wOSwwLjIyIGggMTAuMDEgbCAxOC42NCwxLjM5IDQuODcsMy4yMiAyLjkyLDMuOTQgLTAuNDksMyAtNy41LDMuODIgLTEwLjEyLC0yLjQgLTIzLjYyLC01LjYyIC04LjEsLTIuMDIgaCAtMS4xMiB2IDAuNjcgbCA2Ljc1LDYuNiAxMi4zNywxMS4xNyAxNS40OSwxNC40IDAuNzksMy41NiAtMS45OSwyLjgxIC0yLjEsLTAuMyAtMTMuNjEsLTEwLjI0IC01LjI1LC00LjYxIC0xMS44OSwtMTAuMDEgaCAtMC43OSB2IDEuMDUgbCAyLjc0LDQuMDEgMTQuNDcsMjEuNzUgMC43NSw2LjY3IC0xLjA1LDIuMTcgLTMuNzUsMS4zMSAtNC4xMiwtMC43NSAtOC40NywtMTEuODkgLTguNzQsLTEzLjM5IC03LjA1LC0xMiAtMC44NiwwLjQ5IC00LjE2LDQ0LjgxIC0xLjk1LDIuMjkgLTQuNSwxLjcyIC0zLjc1LC0yLjg1IC0xLjk5LC00LjYxIDEuOTksLTkuMTEgMi40LC0xMS44OSAxLjk1LC05LjQ1IDEuNzYsLTExLjc0IDEuMDUsLTMuOSAtMC4wNywtMC4yNiAtMC44NiwwLjExIC04Ljg1LDEyLjE1IC0xMy40NiwxOC4xOSAtMTAuNjUsMTEuNCAtMi41NSwxLjAxIC00LjQyLC0yLjI5IDAuNDEsLTQuMDkgMi40NywtMy42NCAxNC43NCwtMTguNzUgOC44OSwtMTEuNjIgNS43NCwtNi43MSAtMC4wNCwtMC45NyBoIC0wLjM0IGwgLTM5LjE1LDI1LjQyIC02Ljk3LDAuOSAtMywtMi44MSAwLjM3LC00LjYxIDEuNDIsLTEuNSAxMS43NywtOC4xIC0wLjA0LDAuMDQgeiIKICAgICAgIHNoYXBlLXJlbmRlcmluZz0ib3B0aW1pemVRdWFsaXR5IgogICAgICAgaWQ9InBhdGgxNDciIC8+CiAgICA8cGF0aAogICAgICAgY2xhc3M9ImNscy0xIgogICAgICAgZD0ibSAzMTcuNzMsMzQ5LjMzIGMgLTE4LjgyLDAgLTMxLjY5LC0xMC41IC0zNy43NiwtMjYuNjYgLTMuMTcsLTguNDIgLTQuNzQsLTE3LjM2IC00LjYxLC0yNi4zNiAwLC0yNy4xMSAxMi4xNSwtNDUuOTQgMzksLTQ1Ljk0IDE4LjA0LDAgMjkuMTcsNy44NyAzNS41MSwyNi42NiBoIDcuNzIgbCAtMS4wNSwtMjUuOTEgYyAtMTAuOCwtNi45NyAtMjQuMywtMTAuNSAtNDAuNzIsLTEwLjUgLTIzLjE0LDAgLTQyLjgyLDEwLjM1IC01My43NywyOS4wMiAtNS42Niw5Ljg2IC04LjUzLDIxLjA3IC04LjMyLDMyLjQ0IDAsMjAuNzQgOS43OSwzOS4xMSAyOC4xNiw0OS4zMSAxMC4wNiw1LjM3IDIxLjM0LDguMDQgMzIuNzQsNy43MiAxNy45MiwwIDMyLjE0LC0zLjQxIDQ0Ljc0LC05LjM3IGwgMy4yNiwtMjguNTcgaCAtNy44NyBjIC00LjcyLDEzLjA1IC0xMC4zNSwyMC44OSAtMTkuNjksMjUuMDUgLTQuNTcsMi4wNiAtMTAuMzUsMy4xMSAtMTcuMzIsMy4xMSB6IG0gODEuMTgsLTk4Ljk2IDAuNzUsLTEyLjc1IGggLTUuMzIgbCAtMjMuNyw3LjEyIHYgMy44NiBsIDEwLjUsNC44NyB2IDg5LjE3IGMgMCw2LjA3IC0zLjExLDcuNDIgLTExLjI1LDguNDQgdiA2LjUyIGggNDAuMzEgdiAtNi41MiBjIC04LjE3LC0xLjAxIC0xMS4yNSwtMi4zNiAtMTEuMjUsLTguNDQgViAyNTAuNCBsIC0wLjA0LC0wLjA0IHogbSAxNjAuMzEsMTA4Ljc1IGggMy4xMSBsIDI3LjI2LC01LjE3IHYgLTYuNjcgbCAtMy44MiwtMC4zIGMgLTYuMzcsLTAuNiAtOC4wMiwtMS45MSAtOC4wMiwtNy4xMiB2IC00Ny41NSBsIDAuNzUsLTE1LjI2IGggLTQuMzEgbCAtMjUuNzYsMy43MSB2IDYuNTIgbCAyLjUxLDAuNDUgYyA2Ljk3LDEuMDEgOS4wNCwyLjk2IDkuMDQsNy44NCB2IDQyLjM3IGMgLTYuNjcsNS4xNyAtMTMuMDUsOC40NCAtMjAuNjIsOC40NCAtOC40LDAgLTEzLjYxLC00LjI3IC0xMy42MSwtMTQuMjUgdiAtMzkuNzkgbCAwLjc1LC0xNS4yNiBoIC00LjQyIGwgLTI1LjgsMy43MSB2IDYuNTIgbCAyLjY2LDAuNDUgYyA2Ljk3LDEuMDEgOS4wNCwyLjk2IDkuMDQsNy44NCB2IDM5LjExIGMgMCwxNi41NyA5LjM3LDI0LjQ1IDI0LjMsMjQuNDUgMTEuNCwwIDIwLjc0LC02LjA3IDI3Ljc1LC0xNC41MSBsIC0wLjc1LDE0LjUxIC0wLjA0LC0wLjA0IHogTSA0ODQuMywzMDYuMzYgYyAwLC0yMS4xOSAtMTEuMjUsLTI5LjMyIC0zMS41NywtMjkuMzIgLTE3LjkyLDAgLTMwLjk0LDcuNDIgLTMwLjk0LDE5LjcyIDAsMy42NyAxLjMxLDYuNDkgMy45Nyw4LjQ0IGwgMTMuNjUsLTEuOCBjIC0wLjYsLTQuMTIgLTAuOSwtNi42NCAtMC45LC03LjY5IDAsLTYuOTcgMy43MSwtMTAuNSAxMS4yNSwtMTAuNSAxMS4xNCwwIDE2Ljc2LDcuODQgMTYuNzYsMjAuNDQgdiA0LjEyIGwgLTI4LjEyLDguNDQgYyAtOS4zNywyLjU1IC0xNC43LDQuNzYgLTE4LjI2LDkuOTQgLTEuODksMy4xNyAtMi44LDYuODIgLTIuNjIsMTAuNSAwLDEyIDguMjUsMjAuNDcgMjIuMzUsMjAuNDcgMTAuMiwwIDE5LjI0LC00LjYxIDI3LjExLC0xMy4zNSAyLjgxLDguNzQgNy4xMiwxMy4zNSAxNC44MSwxMy4zNSA2LjIyLDAgMTEuODUsLTIuNTEgMTYuODcsLTcuNDIgbCAtMS41LC01LjE3IGMgLTIuMTcsMC42IC00LjI3LDAuOSAtNi40OSwwLjkgLTQuMzEsMCAtNi4zNywtMy40MSAtNi4zNywtMTAuMDkgdiAtMzAuOTcgeiBtIC0zNiw0MC43NiBjIC03LjY5LDAgLTEyLjQ1LC00LjQ2IC0xMi40NSwtMTIuMyAwLC01LjMyIDIuNTEsLTguNDQgNy44NywtMTAuMjQgbCAyMi44LC03LjI0IHYgMjEuOSBjIC03LjI3LDUuNTEgLTExLjU1LDcuODcgLTE4LjIyLDcuODcgeiBtIDIzNy4zNiw2LjgyIHYgLTYuNjcgbCAtMy44NiwtMC4zIGMgLTYuMzcsLTAuNiAtNy45OSwtMS45MSAtNy45OSwtNy4xMiB2IC04OS40NyBsIDAuNzUsLTEyLjc1IGggLTUuMzYgbCAtMjMuNyw3LjEyIHYgMy44NiBsIDEwLjUsNC44NyB2IDI5LjMyIGMgLTUuOTEsLTQuMDUgLTEyLjk4LC02LjA4IC0yMC4xNCwtNS43NyAtMjMuNTUsMCAtNDEuOTIsMTcuOTIgLTQxLjkyLDQ0Ljc0IDAsMjIuMDkgMTMuMiwzNy4zNSAzNC45NSwzNy4zNSAxMS4yNSwwIDIxLjA0LC01LjQ3IDI3LjExLC0xMy45NSBsIC0wLjc1LDEzLjk1IGggMy4xNSBsIDI3LjI2LC01LjE3IHYgMCB6IG0gLTQ5LjM1LC02OC4wMiBjIDExLjI1LDAgMTkuNjksNi41MiAxOS42OSwxOC41MiB2IDMzLjc1IGMgLTUuMTgsNS4xNiAtMTIuMjMsOCAtMTkuNTQsNy44NyAtMTYuMTIsMCAtMjQuMywtMTIuNzUgLTI0LjMsLTI5Ljc3IDAsLTE5LjEyIDkuMzQsLTMwLjM3IDI0LjE1LC0zMC4zNyB6IE0gNzQzLjMsMzAyLjggYyAtMi4xLC05LjkgLTguMTcsLTE1LjUyIC0xNi42MSwtMTUuNTIgLTEyLjYsMCAtMjEuMzQsOS40OSAtMjEuMzQsMjMuMSAwLDIwLjE0IDEwLjY1LDMzLjE5IDI3Ljg2LDMzLjE5IDExLjQ4LC0wLjEyIDIyLjA0LC02LjMzIDI3LjcxLC0xNi4zMSBsIDUuMDIsMS4zNSBjIC0yLjI1LDE3LjQ3IC0xOC4wNywzMC41MiAtMzcuNSwzMC41MiAtMjIuOCwwIC0zOC41MSwtMTYuODcgLTM4LjUxLC00MC44NyAwLC0yNCAxNy4wNiwtNDEuMjEgMzkuODYsLTQxLjIxIDE3LjAyLDAgMjkuMDIsMTAuMjQgMzIuODksMjguMDEgbCAtNTkuNCwxOC4yMiB2IC04LjAyIGwgNDAuMDEsLTEyLjQxIHYgLTAuMDQgeiIKICAgICAgIHNoYXBlLXJlbmRlcmluZz0ib3B0aW1pemVRdWFsaXR5IgogICAgICAgaWQ9InBhdGgxNDkiIC8+CiAgPC9nPgo8L3N2Zz4K" alt="Claude" />
+    </div>
+  </div>
+</section>
+
+<section class="content">
+  <div class="section">
+    <div class="section-kicker"><span class="section-num">06</span> Neste steg</div>
+    <h2 class="section-title">Vi tar én prosess først, og får den til å stå</h2>
+    <p>
+      AI-rådgivning fra Commit er ikke et kurs og ikke en lisens. Vi setter oss ned i
+      arbeidsdagen deres, finner oppgaven der forskjellen blir størst, og bygger den ferdig
+      sammen med dere — mot systemene dere allerede har.
+    </p>
+    <ul class="bullets">
+      <li><strong>Vi finner prosessen som er verdt å ta først.</strong> Ikke den mest
+        avanserte — den som koster mest tid i dag.</li>
+      <li><strong>Vi kjører den sammen med dere til den står av seg selv.</strong></li>
+      <li><strong>Vi lærer opp folkene som skal eie den.</strong> Prosessen skal bo hos
+        dere, ikke hos oss.</li>
+    </ul>
+
+    <div class="pullquote">
+      Har dere en oppgave noen gruer seg til den siste uka i måneden? Det er som regel
+      der vi begynner.
+    </div>
+
+    <p>
+      Start med et kartleggingsmøte på en time. Vi går gjennom arbeidsmåneden deres,
+      plukker ut én prosess, og sier ærlig fra om den er egnet eller ikke.
+    </p>
+
+    <div class="contact-card">
+      <div class="contact-label">Ta kontakt</div>
+      <div class="contact-name">Øystein Kopstad</div>
+      <div class="contact-role">Commit AS</div>
+      <div class="contact-detail">E-post: <a href="mailto:kopstad@commit.no">kopstad@commit.no</a></div>
+      <div class="contact-detail">Org.nr: 934&nbsp;427&nbsp;688</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>©2026 Commit AS · org.nr 934&nbsp;427&nbsp;688 · Offisiell Anthropic Partner</p>
+</footer>
+
+</body>
+</html>
