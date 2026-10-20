@@ -41,8 +41,8 @@ Skrytemateriell som viser hvordan Commit automatiserer kontorarbeid i samspill m
 | Fil | Hva |
 |---|---|
 | `kontorarbeid/index.html` | Nettsiden. Tekst og skjermglimt, klar til å flyttes til commit.no. |
-| `kontorarbeid/karusell.html` | Kilden til LinkedIn-karusellen, åtte kort i 1080 x 1350. |
-| `kontorarbeid/karusell/kort-01.png` … `kort-08.png` | Kortene som bilder. |
+| `kontorarbeid/karusell.html` | Kilden til LinkedIn-karusellen, ni kort i 1080 x 1350. |
+| `kontorarbeid/karusell/kort-01.png` … `kort-09.png` | Kortene som bilder. |
 | `kontorarbeid/en-vanlig-maned-hos-commit.pdf` | Kortene som PDF (LinkedIn-dokument). |
 | `kontorarbeid/linkedin-innlegg.md` | Forslag til innlegget som følger karusellen. |
 | `kontorarbeid/karusell/index.html` | Underside til gjennomsyn: kortene som sveip, innleggsteksten og PDF-lenke. |
