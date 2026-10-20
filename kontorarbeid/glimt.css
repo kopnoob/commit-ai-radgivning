@@ -113,3 +113,22 @@
 .finding:first-child { border-top: 0; padding-top: 0; }
 .finding::before { content: ""; width: 0.75rem; height: 0.75rem; border-radius: 50%; border: 2px solid var(--blue); justify-self: center; }
 .finding small { display: block; font-weight: 400; color: var(--ink-soft); font-size: var(--fs-xs); margin-top: 0.1rem; }
+
+/* Stegkjede: mennesket i endene, Claude imellom */
+.steps { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.4rem; position: relative; }
+.steps::before { content: ""; position: absolute; left: 7%; right: 7%; top: 0.8rem; height: 2px; background: var(--blue); }
+.step { display: grid; justify-items: center; min-width: 0; gap: 0.5rem; text-align: center; position: relative; }
+.step i {
+  width: 1.65rem; height: 1.65rem; border-radius: 50%;
+  background: var(--blue); color: var(--white);
+  display: grid; place-items: center;
+  font-style: normal; font-weight: 700; font-size: var(--fs-xs);
+}
+.step.is-human i { background: var(--white); border: 2px solid var(--ink); }
+.step span { font-size: var(--fs-xs); line-height: 1.25; color: var(--ink-mid); overflow-wrap: anywhere; }
+.step.is-human span { font-weight: 600; color: var(--ink); }
+@media (max-width: 680px) {
+  .steps { grid-template-columns: 1fr; gap: 0.6rem; }
+  .steps::before { left: calc(0.825rem - 1px); right: auto; top: 0.8rem; bottom: 0.8rem; width: 2px; height: auto; }
+  .step { grid-template-columns: 1.65rem 1fr; justify-items: start; text-align: left; gap: 0.7rem; align-items: center; }
+}

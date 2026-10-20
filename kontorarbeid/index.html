@@ -11,6 +11,16 @@
 <link rel="stylesheet" href="commit-style.css" />
 <link rel="stylesheet" href="glimt.css" />
 <style>
+  /* Før og nå, rett under hero */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 1rem 0 3rem; }
+  .compare-col { border-top: 2px solid var(--ink); padding-top: 0.75rem; display: grid; gap: 0.35rem; }
+  .compare-label { font-size: var(--fs-sm); font-weight: 500; color: var(--ink-soft); }
+  .compare-value { font-size: var(--fs-xl); font-weight: 700; letter-spacing: -0.035em; line-height: 1.05; color: var(--ink-soft); }
+  .is-now .compare-value { color: var(--blue); }
+  .compare-sub { font-size: var(--fs-sm); color: var(--ink-soft); }
+  .compare .ba-track { margin-top: 0.6rem; }
+  .compare-point { grid-column: 1 / -1; font-size: var(--fs-md); line-height: 1.5; color: var(--ink-mid); margin: 0.25rem 0 0; max-width: 640px; }
+  @media (max-width: 680px) { .compare { grid-template-columns: 1fr; gap: 1.4rem; } }
   /* Månedsrytmen: markør til venstre, tekst og skjermglimt til høyre */
   .rhythm { display: grid; gap: 2.5rem; margin: 2rem 0 1rem; }
   .beat { display: grid; grid-template-columns: 9rem 1fr; gap: 2rem; align-items: start; border-top: 2px solid var(--ink); padding-top: 1.5rem; }
@@ -54,10 +64,20 @@
 
 <section class="content">
 
-  <div class="kpis">
-    <div class="kpi"><div class="kpi-value">4 til 5 t</div><div class="kpi-label">menneskearbeid per lønnskjøring, før</div></div>
-    <div class="kpi"><div class="kpi-value">15 min</div><div class="kpi-label">kvalitetskontroll per lønnskjøring, nå</div></div>
-    <div class="kpi"><div class="kpi-value">40 min</div><div class="kpi-label">maskintid som går av seg selv, mens vi gjør noe annet</div></div>
+  <div class="compare">
+    <div class="compare-col">
+      <div class="compare-label">Før</div>
+      <div class="compare-value">4 til 5 timer</div>
+      <div class="compare-sub">menneskearbeid per lønnskjøring</div>
+      <div class="ba-track"><div class="ba-fill" style="width:100%"></div></div>
+    </div>
+    <div class="compare-col is-now">
+      <div class="compare-label">Nå</div>
+      <div class="compare-value">Et kvarter</div>
+      <div class="compare-sub">kvalitetskontroll per lønnskjøring</div>
+      <div class="ba-track"><div class="ba-fill is-blue" style="width:6%"></div></div>
+    </div>
+    <p class="compare-point">Det er <strong>menneskets tid</strong> som krympet. Maskinen jobber fortsatt i rundt tre kvarter, men det går av seg selv mens vi gjør noe annet. Kvarteret vårt går til å se på tallene, ikke til å taste dem.</p>
   </div>
 
   <div class="section">
@@ -91,12 +111,16 @@
           <h3>Lønnskjøringen tar et kvarter<span class="dot">.</span></h3>
           <p>Fire til fem timer menneskearbeid ble 15 minutter kvalitetskontroll. Claude henter omsetning fra økonomisystemet, beregner, fører i regnearket og avstemmer. Vi bekrefter forutsetningene før start og godkjenner før noe sendes til lønnsbyrået.</p>
           <div class="glimt">
-            <div class="glimt-head"><span>Menneskelig tid per kjøring</span></div>
-            <div class="beforeafter">
-              <div class="ba-row"><span class="ba-label">Før</span><div class="ba-track"><div class="ba-fill" style="width:100%"></div></div><span class="ba-value">4 til 5 timer</span></div>
-              <div class="ba-row"><span class="ba-label">Nå</span><div class="ba-track"><div class="ba-fill is-blue" style="width:6%"></div></div><span class="ba-value is-blue">15 min</span></div>
+            <div class="glimt-head"><span>Én kjøring</span><span class="pill is-soft">Du bekrefter og godkjenner</span></div>
+            <div class="steps">
+              <div class="step is-human"><i></i><span>Du bekrefter</span></div>
+              <div class="step"><i>1</i><span>Omsetning</span></div>
+              <div class="step"><i>2</i><span>Fordeling</span></div>
+              <div class="step"><i>3</i><span>Lønn</span></div>
+              <div class="step"><i>4</i><span>Honorar</span></div>
+              <div class="step"><i>5</i><span>Kontroll</span></div>
+              <div class="step is-human"><i></i><span>Du godkjenner</span></div>
             </div>
-            <div class="ba-note">Pluss rundt 40 minutter maskintid som går av seg selv.</div>
           </div>
         </div>
       </div>
