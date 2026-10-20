@@ -33,7 +33,7 @@ tekst mot boksen sin og fanger overflow.
 
 ## Kontorarbeid: «En vanlig måned hos Commit»
 
-Skrytemateriell som viser hvordan Commit automatiserer kontorarbeid i samspill med Claude
+Skrytemateriell som viser hvordan Commit automatiserer kontorarbeid i samspill med AI
 (oktober 2026). Ligger i `kontorarbeid/`.
 
 **Publisert:** https://kopnoob.github.io/commit-ai-radgivning/kontorarbeid/
@@ -45,6 +45,7 @@ Skrytemateriell som viser hvordan Commit automatiserer kontorarbeid i samspill m
 | `kontorarbeid/karusell/kort-01.png` … `kort-08.png` | Kortene som bilder. |
 | `kontorarbeid/en-vanlig-maned-hos-commit.pdf` | Kortene som PDF (LinkedIn-dokument). |
 | `kontorarbeid/linkedin-innlegg.md` | Forslag til innlegget som følger karusellen. |
+| `kontorarbeid/karusell/index.html` | Underside til gjennomsyn: kortene som sveip, innleggsteksten og PDF-lenke. |
 | `kontorarbeid/commit-style.css`, `glimt.css`, `assets/` | Designsystemet (v2.0 «Punktum.») og de stiliserte skjermglimtene. |
 
 Kortene rendres fra `karusell.html` med Playwright fra `Designsystem Commit/tools/`
