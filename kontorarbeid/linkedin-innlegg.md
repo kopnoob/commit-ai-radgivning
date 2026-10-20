@@ -18,7 +18,7 @@ I karusellen viser vi fem av dem:
 • Doffin som sjekkes hver dag, med søknad på én knapp
 • prosjektøkonomi som er klar før kaffen
 
-Og det som overrasket oss mest: Claude fanger avvik vi selv ville blafret forbi.
+Og det som overrasket oss mest: Claude fanger avvik vi selv ville bladd forbi.
 
 Nå hjelper vi andre virksomheter i gang med det samme. Én prosess først, bygget sammen med dere, i systemene dere allerede har.
 
