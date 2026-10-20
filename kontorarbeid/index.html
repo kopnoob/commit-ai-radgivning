@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>En vanlig måned hos Commit</title>
+<meta name="description" content="Slik ser kontorarbeidet ut hos Commit når Claude gjør klikkingen og vi tar avgjørelsene. Og slik hjelper vi andre virksomheter i gang." />
+<meta property="og:title" content="En vanlig måned hos Commit" />
+<meta property="og:description" content="Kontorarbeid i samspill med Claude: timeføring, lønn, salg, anbud og prosjektøkonomi. Og en invitasjon." />
+<meta property="og:image" content="https://kopnoob.github.io/commit-ai-radgivning/kontorarbeid/karusell/kort-01.png" />
+<link rel="stylesheet" href="commit-style.css" />
+<link rel="stylesheet" href="glimt.css" />
+<style>
+  /* Månedsrytmen: markør til venstre, tekst og skjermglimt til høyre */
+  .rhythm { display: grid; gap: 2.5rem; margin: 2rem 0 1rem; }
+  .beat { display: grid; grid-template-columns: 9rem 1fr; gap: 2rem; align-items: start; border-top: 2px solid var(--ink); padding-top: 1.5rem; }
+  .beat .bigdot { --size: 9rem; margin: 0; align-items: center; text-align: center; padding: 0; }
+  .beat .bigdot-value { font-size: 2.6rem; }
+  .beat .bigdot-title { font-size: 1.25rem; }
+  .beat .bigdot-sub { font-size: var(--fs-xs); margin-top: 0.2rem; }
+  .beat h3 { font-size: var(--fs-lg); font-weight: 700; letter-spacing: -0.03em; line-height: 1.15; color: var(--ink); margin: 0.2rem 0 0.7rem; }
+  .beat p { margin-bottom: 1.1rem; }
+  .beat .glimt { max-width: 560px; }
+  .cta-wrap { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center; margin: 3rem 0 1rem; }
+  .cta-wrap .bigdot { --size: 13rem; margin: 0; }
+  .honest { font-size: var(--fs-sm); color: var(--ink-soft); }
+  @media (max-width: 680px) {
+    .beat { grid-template-columns: 1fr; gap: 1rem; }
+    .beat .bigdot { --size: 7rem; }
+    .cta-wrap { grid-template-columns: 1fr; }
+    .cta-wrap .bigdot { --size: 11rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="nav-wrap">
+    <div class="logo-lockup">
+      <a href="https://commit.no"><img src="assets/logos/commit_logo.svg" alt="Commit" class="logo-img" /></a>
+    </div>
+    <div class="nav-meta">AI-støttet kontorarbeid</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">Fra egen drift</div>
+  <h1>En vanlig måned hos Commit<span class="dot">.</span></h1>
+  <p class="hero-ingress">
+    Vi er et konsulentselskap med rundt 28 ansatte. Kontorarbeidet vårt gjør vi i samspill med Claude:
+    den tar klikkingen og tastingen, vi tar avgjørelsene. Her er rytmen i en måned, slik den faktisk går.
+  </p>
+</section>
+
+<section class="content">
+
+  <div class="kpis">
+    <div class="kpi"><div class="kpi-value">4 til 5 t</div><div class="kpi-label">menneskearbeid per lønnskjøring, før</div></div>
+    <div class="kpi"><div class="kpi-value">15 min</div><div class="kpi-label">kvalitetskontroll per lønnskjøring, nå</div></div>
+    <div class="kpi"><div class="kpi-value">40 min</div><div class="kpi-label">maskintid som går av seg selv, mens vi gjør noe annet</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-kicker"><span class="section-num">01</span> Måneden</div>
+    <h2 class="section-title">Det meste skjer uten at noen setter det i gang<span class="dot">.</span></h2>
+    <p>Hver oppgave under er en prosess vi først gjorde for hånd. Nå er den skrevet ned som en instruks Claude følger, med faste punkter der et menneske bekrefter og godkjenner.</p>
+
+    <div class="rhythm">
+
+      <div class="beat">
+        <div class="bigdot"><div class="bigdot-value">1.</div><div class="bigdot-sub">hver måned</div></div>
+        <div>
+          <h3>Ingen purrer på timer<span class="dot">.</span></h3>
+          <p>Claude sjekker hvem som ikke har levert timene sine, og sender en vennlig påminnelse til hver enkelt. Ledelsen får en oppsummering, og ingen trenger å huske å purre.</p>
+          <div class="glimt">
+            <div class="glimt-head"><span>Melding fra Claude</span><span class="pill">Sendt automatisk</span></div>
+            <div class="msg">
+              <div class="msg-avatar">C</div>
+              <div>
+                <div class="msg-meta"><strong>Claude</strong><span>i dag 07:02</span></div>
+                <div class="msg-text">Hei! Timene dine for forrige måned er ikke merket som ferdig registrert. Rekker du det i dag?</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="beat">
+        <div class="bigdot"><div class="bigdot-title">Uke 1</div><div class="bigdot-sub">lønnskjøring</div></div>
+        <div>
+          <h3>Lønnskjøringen tar et kvarter<span class="dot">.</span></h3>
+          <p>Fire til fem timer menneskearbeid ble 15 minutter kvalitetskontroll. Claude henter omsetning fra økonomisystemet, beregner, fører i regnearket og avstemmer. Vi bekrefter forutsetningene før start og godkjenner før noe sendes til lønnsbyrået.</p>
+          <div class="glimt">
+            <div class="glimt-head"><span>Menneskelig tid per kjøring</span></div>
+            <div class="beforeafter">
+              <div class="ba-row"><span class="ba-label">Før</span><div class="ba-track"><div class="ba-fill" style="width:100%"></div></div><span class="ba-value">4 til 5 timer</span></div>
+              <div class="ba-row"><span class="ba-label">Nå</span><div class="ba-track"><div class="ba-fill is-blue" style="width:6%"></div></div><span class="ba-value is-blue">15 min</span></div>
+            </div>
+            <div class="ba-note">Pluss rundt 40 minutter maskintid som går av seg selv.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="beat">
+        <div class="bigdot"><div class="bigdot-title">Hver time</div><div class="bigdot-sub">på hverdager</div></div>
+        <div>
+          <h3>Salgsposten leser seg selv<span class="dot">.</span></h3>
+          <p>Forespørsler fra e-post og innkjøpsportaler blir én ryddig oversikt med rolle, frist og status. Vi bruker tiden på å avgjøre om vi vil levere, ikke på å lete i innboksen.</p>
+          <div class="glimt">
+            <div class="glimt-head"><span>Forespørsler</span><span class="pill is-soft">Oppdatert for 12 min siden</span></div>
+            <div class="rows">
+              <div class="row"><span class="bar w4 is-dark"></span><span class="bar w3"></span><span class="pill is-blue">Ny</span></div>
+              <div class="row"><span class="bar w3 is-dark"></span><span class="bar w4"></span><span class="pill">Vurderes</span></div>
+              <div class="row"><span class="bar w4 is-dark"></span><span class="bar w2"></span><span class="pill">I arbeid</span></div>
+              <div class="row"><span class="bar w2 is-dark"></span><span class="bar w3"></span><span class="pill is-soft">Levert</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="beat">
+        <div class="bigdot"><div class="bigdot-title">Hver dag</div><div class="bigdot-sub">anbudsovervåking</div></div>
+        <div>
+          <h3>Doffin sjekkes uten at noen husker det<span class="dot">.</span></h3>
+          <p>Nye rammeavtaler og dynamiske innkjøpsordninger dukker opp i dashbordet vårt. Vil vi søke, trykker vi på én knapp. Claude gjør søknaden, og status kommer tilbake til dashbordet av seg selv.</p>
+          <div class="glimt">
+            <div class="glimt-head"><span>Ny kunngjøring</span><span class="pill is-soft">Frist om 14 dager</span></div>
+            <div class="tender">
+              <div class="tender-top"><span class="bar w4 is-dark"></span><span class="bar w3"></span><span class="bar w2"></span></div>
+              <div class="tender-foot"><span class="btn">Søk med Claude</span><span class="status-ok">Søknad levert</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="beat">
+        <div class="bigdot"><div class="bigdot-title">Kl. 08</div><div class="bigdot-sub">hver morgen</div></div>
+        <div>
+          <h3>Tallene er klare før kaffen<span class="dot">.</span></h3>
+          <p>Hver konsulent har sin egen side med timer, omsetning og prosjektøkonomi. En fast jobb henter tallene, og Claude oppdaterer, publiserer og sjekker at alt virker, hver morgen.</p>
+          <div class="glimt">
+            <div class="glimt-head"><span>Min prosjektøkonomi</span><span class="pill">Sjekket 08:00</span></div>
+            <div class="tiles">
+              <div class="tile"><span class="bar w3"></span><div class="spark"><i style="height:40%"></i><i style="height:55%"></i><i style="height:48%"></i><i style="height:70%"></i><i style="height:62%"></i><i class="is-blue" style="height:85%"></i></div></div>
+              <div class="tile"><span class="bar w2"></span><div class="spark"><i style="height:60%"></i><i style="height:58%"></i><i style="height:66%"></i><i style="height:52%"></i><i style="height:74%"></i><i class="is-blue" style="height:78%"></i></div></div>
+              <div class="tile"><span class="bar w3"></span><div class="spark"><i style="height:30%"></i><i style="height:45%"></i><i style="height:42%"></i><i style="height:58%"></i><i style="height:66%"></i><i class="is-blue" style="height:72%"></i></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-kicker"><span class="section-num">02</span> Underveis</div>
+    <h2 class="section-title">Claude ser det vi lett overser<span class="dot">.</span></h2>
+    <p>Det som overrasket oss mest, var ikke farten. Det var at Claude fanger avvik et menneske lett blar forbi. Avvikene stopper ikke jobben. De samles opp og legges fram samlet til slutt, så fagpersonen bruker tiden på å vurdere i stedet for å taste.</p>
+    <div class="glimt" style="max-width:560px">
+      <div class="glimt-head"><span>Fanget i lønnskjøringen</span><span class="pill">Til vurdering</span></div>
+      <div class="findings">
+        <div class="finding"><div>Faktura uten prosjekt<small>Holdt utenfor beregningen og løftet fram</small></div></div>
+        <div class="finding"><div>Lønn på feil prosjekt<small>Rettet og kontrollert på nytt</small></div></div>
+        <div class="finding"><div>Utlegg som ikke var ferdigbehandlet<small>Varslet før utbetaling, ikke etterpå</small></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-kicker"><span class="section-num">03</span> Arbeidsmåten</div>
+    <h2 class="section-title">Tre ting vi holder fast ved<span class="dot">.</span></h2>
+    <div class="cards is-3">
+      <div class="card">
+        <div class="card-label">Kontroll</div>
+        <div class="card-title">Mennesket har siste ord</div>
+        <div class="card-body">Ingenting går ut av huset uten at noen har lest og godkjent. Claude lager utkastet, et menneske trykker send.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Eierskap</div>
+        <div class="card-title">Prosessen bor hos dere</div>
+        <div class="card-body">Instruksene er vanlig tekst i filer virksomheten eier og kan endre selv. Ingen svart boks, ingen innelåsing.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Kompetanse</div>
+        <div class="card-title">Fagfolkene blir viktigere</div>
+        <div class="card-body">Når tallene foreligger etter et kvarter, går tiden til å faktisk se på dem. Vurderingen er fortsatt menneskets.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-kicker"><span class="section-num">04</span> Og hos dere</div>
+    <h2 class="section-title">Hvordan ser deres måned ut?</h2>
+    <p>Vi hjelper virksomheter i gang med AI-støttet kontorarbeid. Ikke et kurs og ikke en lisens: vi setter oss ned i arbeidsdagen deres, finner oppgaven der forskjellen blir størst, og bygger den ferdig sammen med dere, i systemene dere allerede har. Så lærer vi opp dem som skal eie den.</p>
+    <div class="cta-wrap">
+      <div>
+        <p><strong>Start med en times kartlegging.</strong> Vi går gjennom arbeidsmåneden deres, plukker ut én prosess og sier ærlig fra om den egner seg.</p>
+        <p class="honest">Har dere en oppgave noen gruer seg til den siste uka i måneden? Det er som regel der vi begynner.</p>
+      </div>
+      <a class="bigdot" href="mailto:kopstad@commit.no?subject=Kartlegging%20av%20AI-st%C3%B8ttet%20kontorarbeid" style="text-decoration:none">
+        <div class="bigdot-title">Book en time<span style="opacity:.6">.</span></div>
+        <div class="bigdot-sub">kopstad@commit.no</div>
+      </a>
+    </div>
+
+    <div class="contact-card">
+      <div class="contact-label">Ta kontakt</div>
+      <div class="contact-name">Øystein Kopstad</div>
+      <div class="contact-role">Daglig leder, Commit AS</div>
+      <div class="contact-detail">E-post: <a href="mailto:kopstad@commit.no">kopstad@commit.no</a></div>
+      <div class="contact-detail">Commit er Claude-partner og bruker selv det vi hjelper andre med.</div>
+    </div>
+  </div>
+
+</section>
+
+<footer>
+  <p>© 2026 Commit AS · org.nr 934 427 688 · <a href="https://commit.no">commit.no</a></p>
+</footer>
+
+</body>
+</html>

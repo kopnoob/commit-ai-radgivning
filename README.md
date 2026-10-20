@@ -30,3 +30,22 @@ cp ai-radgivning.pdf  <dette-repoet>/
 Skissene er SVG generert av `figurer.py`. Kjør
 `Designsystem Commit/tools/sjekk-figurer.mjs` før publisering — den måler hver
 tekst mot boksen sin og fanger overflow.
+
+## Kontorarbeid: «En vanlig måned hos Commit»
+
+Skrytemateriell som viser hvordan Commit automatiserer kontorarbeid i samspill med Claude
+(oktober 2026). Ligger i `kontorarbeid/`.
+
+**Publisert:** https://kopnoob.github.io/commit-ai-radgivning/kontorarbeid/
+
+| Fil | Hva |
+|---|---|
+| `kontorarbeid/index.html` | Nettsiden. Tekst og skjermglimt, klar til å flyttes til commit.no. |
+| `kontorarbeid/karusell.html` | Kilden til LinkedIn-karusellen, åtte kort i 1080 x 1350. |
+| `kontorarbeid/karusell/kort-01.png` … `kort-08.png` | Kortene som bilder. |
+| `kontorarbeid/en-vanlig-maned-hos-commit.pdf` | Kortene som PDF (LinkedIn-dokument). |
+| `kontorarbeid/linkedin-innlegg.md` | Forslag til innlegget som følger karusellen. |
+| `kontorarbeid/commit-style.css`, `glimt.css`, `assets/` | Designsystemet (v2.0 «Punktum.») og de stiliserte skjermglimtene. |
+
+Kortene rendres fra `karusell.html` med Playwright fra `Designsystem Commit/tools/`
+(scriptet `render-karusell.mjs` ligger i OneDrive under `Salg Commit/AI-rådgivning/Kontorarbeid/`).

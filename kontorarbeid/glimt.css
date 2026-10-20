@@ -1,0 +1,115 @@
+/* Skjermglimt: forenklede, stiliserte biter av verktøyene våre.
+   Ingen ekte data, bare form. Bygger på designsystemets tokens. */
+
+.glimt {
+  background: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  font-size: var(--fs-sm);
+  color: var(--ink-mid);
+  line-height: 1.45;
+}
+.glimt-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 0.8rem;
+}
+.glimt-head .pill { margin-left: auto; }
+
+/* Grå strek som står for tekst vi ikke viser */
+.bar {
+  display: inline-block;
+  height: 0.6em;
+  border-radius: 999px;
+  background: var(--line);
+  vertical-align: middle;
+}
+.bar.w1 { width: 22%; }
+.bar.w2 { width: 34%; }
+.bar.w3 { width: 48%; }
+.bar.w4 { width: 62%; }
+.bar.is-dark { background: #C9D2DE; }
+
+/* Statuspille */
+.pill {
+  display: inline-block;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.38em 0.75em;
+  border-radius: 999px;
+  background: var(--mist);
+  color: var(--blue);
+  white-space: nowrap;
+}
+.pill.is-blue { background: var(--blue); color: var(--white); }
+.pill.is-soft { background: var(--mist); color: var(--ink-soft); }
+
+/* Melding (påminnelse) */
+.msg { display: grid; grid-template-columns: 2.4rem 1fr; gap: 0.8rem; align-items: start; }
+.msg-avatar {
+  width: 2.4rem; height: 2.4rem; border-radius: 50%;
+  background: var(--blue);
+  display: grid; place-items: center;
+  color: var(--white); font-weight: 700; font-size: var(--fs-xs);
+}
+.msg-meta { display: flex; gap: 0.6rem; align-items: baseline; margin-bottom: 0.3rem; }
+.msg-meta strong { color: var(--ink); font-size: var(--fs-sm); }
+.msg-meta span { font-size: var(--fs-xs); color: var(--ink-soft); }
+.msg-text { color: var(--ink-mid); }
+
+/* Før og nå */
+.beforeafter { display: grid; gap: 0.9rem; }
+.ba-row { display: grid; grid-template-columns: 3.2rem 1fr auto; gap: 0.9rem; align-items: center; }
+.ba-label { font-size: var(--fs-xs); font-weight: 600; color: var(--ink-soft); }
+.ba-track { height: 0.75rem; border-radius: 999px; background: var(--mist); overflow: hidden; }
+.ba-fill { height: 100%; border-radius: 999px; background: #C9D2DE; }
+.ba-fill.is-blue { background: var(--blue); }
+.ba-value { font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.ba-value.is-blue { color: var(--blue); }
+.ba-note { font-size: var(--fs-xs); color: var(--ink-soft); margin-top: 0.2rem; }
+
+/* Liste med rader og status */
+.rows { display: grid; }
+.row {
+  display: grid; grid-template-columns: 1.4fr 1fr auto; gap: 1rem; align-items: center;
+  padding: 0.6rem 0; border-top: 1px solid var(--line);
+}
+.row:first-child { border-top: 0; padding-top: 0; }
+.row .bar { display: block; }
+
+/* Kort med knapp (Doffin) */
+.tender { display: grid; gap: 0.75rem; }
+.tender-top { display: grid; gap: 0.45rem; }
+.tender-top .bar { display: block; }
+.tender-foot { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--line); }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: var(--blue); color: var(--white);
+  font-weight: 600; font-size: var(--fs-sm); line-height: 1;
+  padding: 0.7em 1.1em; border-radius: 999px;
+}
+.btn::before { content: ""; width: 0.55em; height: 0.55em; border-radius: 50%; background: var(--white); }
+.status-ok { display: inline-flex; align-items: center; gap: 0.45rem; color: var(--ink); font-weight: 600; }
+.status-ok::before { content: "✓"; color: var(--blue); font-weight: 700; }
+
+/* KPI-fliser uten tall */
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
+.tile { background: var(--mist); border-radius: var(--radius-sm); padding: 0.8rem 0.9rem; display: grid; gap: 0.5rem; }
+.tile .bar { display: block; }
+.spark { display: flex; align-items: flex-end; gap: 3px; height: 2.2rem; }
+.spark i { display: block; flex: 1; background: #C9D2DE; border-radius: 2px 2px 0 0; }
+.spark i.is-blue { background: var(--blue); }
+
+/* Avviksliste */
+.findings { display: grid; }
+.finding { display: grid; grid-template-columns: 1.6rem 1fr; gap: 0.7rem; align-items: center; padding: 0.55rem 0; border-top: 1px solid var(--line); color: var(--ink); font-weight: 600; }
+.finding:first-child { border-top: 0; padding-top: 0; }
+.finding::before { content: ""; width: 0.75rem; height: 0.75rem; border-radius: 50%; border: 2px solid var(--blue); justify-self: center; }
+.finding small { display: block; font-weight: 400; color: var(--ink-soft); font-size: var(--fs-xs); margin-top: 0.1rem; }

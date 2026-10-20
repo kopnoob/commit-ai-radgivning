@@ -1,0 +1,1326 @@
+/* =========================================================
+   COMMIT DESIGN SYSTEM — v2.0 «Punktum.»
+   En felles stil for Commits dokumenter, websider og PDF-er.
+   Bruk via:
+   <link rel="stylesheet" href="../Designsystem Commit/commit-style.css" />
+
+   Fontene (Geologica + JetBrains Mono) ligger lokalt i assets/fonts/ og
+   lastes av denne fila. Du trenger IKKE lenger lenke til Google Fonts.
+
+   Endringer i v2.0 (Punktum.):
+   - Merkevaretro: offisiell Commit-blå #215084 og Geologica (erstatter
+     #2B5C96 og Inter + Lora). Én font, hvit bakgrunn.
+   - Signatur: det blå punktumet fra logoen. <span class="dot">.</span>
+     etter H1/H2, blå prikk i lister og .bigdot for CTA/nøkkeltall.
+   - Typeskala med 7 trinn (--fs-xs … --fs-2xl) i stedet for 27 størrelser.
+   - Ingen sperrede versal-etiketter og ingen dekorativ kursiv.
+   - Ett kort-primitiv (.card). defcard/track/scenario/example/hyp er
+     beholdt som alias, så eksisterende dokumenter fortsatt rendrer.
+   - Nye komponenter: .dot, .bigdot, .kpis, .cover, .cards.
+   - Valgfri LOGG-MODUL (Commit-loggen): .logg-meta, .logg-ref,
+     .logg-hash, .logg-cmd, .logg-graph, .diff og .logg-btn. Slår kun
+     inn når markupen brukes — påvirker ikke resten av dokumentet.
+   - Forrige versjon ligger i arkiv/v1.2/.
+   ========================================================= */
+
+/* ── FONTER (SIL Open Font License — se assets/fonts/) ──
+   Første kilde er lokal (virker offline og i PDF når CSS-en lenkes inn).
+   Andre kilde er Google Fonts og brukes automatisk når CSS-en er limt
+   inn i en standalone-fil der assets/fonts/ ikke finnes ved siden av. */
+@font-face {
+  font-family: 'Geologica';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('assets/fonts/Geologica-latin-ext.woff2') format('woff2'),
+       url('https://fonts.gstatic.com/s/geologica/v5/oY1l8evIr7j9P3TN9YwNAdyjzUyDKkKdAGOJh1UlCDUIhAIdhCZOn1fLsig7jfvCCPHZckUWHVlELWNN-8tr.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Geologica';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('assets/fonts/Geologica-latin.woff2') format('woff2'),
+       url('https://fonts.gstatic.com/s/geologica/v5/oY1l8evIr7j9P3TN9YwNAdyjzUyDKkKdAGOJh1UlCDUIhAIdhCZOn1fLsig7jfvCCPHZckUWE1lELWNN-w.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* JetBrains Mono brukes bare av logg-modulen. Nettleseren laster den først
+   når en tekst faktisk bruker fonten, så den koster ingenting ellers. */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('assets/fonts/JetBrainsMono-latin-ext.woff2') format('woff2'),
+       url('https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbV2o-flEEny0FZhsfKu5WU4xD1OwGtT0rU3BE.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('assets/fonts/JetBrainsMono-latin.woff2') format('woff2'),
+       url('https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbV2o-flEEny0FZhsfKu5WU4xD7OwGtT0rU.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Farger */
+  --blue:        #215084; /* Commit-blå (offisiell) */
+  --blue-dark:   #183D66; /* hover */
+  --blue-light:  #EAF0F7; /* lyse blåflater: ref-piller, markeringer */
+  --mist:        #F3F6FA; /* kortflater */
+  --ink:         #0E1B2C; /* overskrifter, sterk tekst, 2 px-linjer */
+  --ink-mid:     #3A4658; /* brødtekst */
+  --ink-soft:    #5A6577; /* etiketter, sekundærtekst (≈ 5,9:1 mot hvit) */
+  --line:        #E3E8EF; /* tynne skillelinjer */
+  --bg:          #FFFFFF;
+  --white:       #FFFFFF;
+  --warn-bg:     #FFF8E8;
+  --warn-line:   #E2B54A;
+  --warn-ink:    #6B5215;
+
+  /* Typeskala — 7 trinn. Bruk disse, ikke egne størrelser. */
+  --fs-xs:   0.75rem;  /* 12 px  etiketter, fotnoter */
+  --fs-sm:   0.875rem; /* 14 px  sekundærtekst, kort i 2 kolonner */
+  --fs-base: 1rem;     /* 16 px  brødtekst */
+  --fs-md:   1.25rem;  /* 20 px  H3, korttitler, ingress */
+  --fs-lg:   1.75rem;  /* 28 px  H2 */
+  --fs-xl:   2.5rem;   /* 40 px  store tall, RSVP */
+  --fs-2xl:  3.5rem;   /* 56 px  H1 */
+
+  /* Layout */
+  --container: 820px;
+  --radius:    10px;
+  --radius-sm: 6px;
+
+  /* Fonter */
+  --font-sans:  'Geologica', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:  'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-serif: var(--font-sans); /* Utgått i v2 — beholdt så gamle inline-stiler ikke faller til Times. */
+
+  /* Logg-modul */
+  --logg-hash:     #8A5D00;
+  --logg-branch:   #6E9CD2;
+  --diff-add-bg:   #DAFBE1;
+  --diff-add-ink:  #116329;
+  --diff-del-bg:   #FFEBE9;
+  --diff-del-ink:  #82071E;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── BASIS-TYPOGRAFI ──
+   Gjelder globalt fra body. Komponenter overstyrer der det trengs, derfor
+   er spesifisiteten bevisst lav (body p). */
+body p {
+  font-size: var(--fs-base);
+  line-height: 1.7;
+  color: var(--ink-mid);
+  margin-bottom: 1.2rem;
+}
+body strong { color: var(--ink); font-weight: 600; }
+body em { font-style: italic; color: var(--ink); } /* Kursiv kun til faktisk betoning. */
+code { font-family: var(--font-mono); font-size: 0.9em; }
+
+/* ── PUNKTUMET ──
+   Signaturen. Sett et blått punktum etter H1 og H2 som er påstander:
+   <h1>Slik får vi mer gjort med AI<span class="dot">.</span></h1>
+   Ikke etter spørsmål, og maks én .bigdot per side. */
+.dot { color: var(--blue); }
+
+/* ── BULLET-LISTE (blå prikk) ── */
+.bullets {
+  list-style: none;
+  margin: 0 0 1.4rem 0;
+  padding: 0;
+}
+.bullets > li {
+  font-size: var(--fs-base);
+  line-height: 1.65;
+  color: var(--ink-mid);
+  padding-left: 1.4rem;
+  position: relative;
+  margin-bottom: 0.55rem;
+}
+.bullets > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--blue);
+}
+
+/* Lenker i brødtekst får understrek — farge alene er ikke nok signal.
+   Gjelder bare lenker uten klasse, så knapper (.rsvp-btn, .logg-btn)
+   beholder sin egen stil. :where() gir null spesifisitet, så komponenter
+   som .bigdot a og .contact-detail a vinner. */
+:where(.content, .cover) a:not([class]) {
+  color: var(--blue);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+:where(.content, .cover) a:not([class]):hover { color: var(--blue-dark); }
+
+/* På mørke og blå flater arver sterk tekst fargen fra flaten. */
+.contact-card strong,
+.bigdot strong,
+.card.is-blue strong { color: inherit; }
+
+/* ── FOKUS-RING (a11y) ── */
+a:focus-visible,
+button:focus-visible,
+.rsvp-btn:focus-visible,
+.logg-btn:focus-visible,
+.contact-detail a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ── REDUCED MOTION (a11y) ── */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ── NAV ── */
+/* Toppstripe med logo og evt. meta-tekst. */
+header.topnav {
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.nav-wrap {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.logo-lockup {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  color: var(--ink);
+}
+.logo-lockup .logo-img { height: 24px; width: auto; display: block; }
+.logo-lockup .logo-secondary { height: 28px; width: auto; display: block; }
+.logo-divider {
+  width: 1px;
+  height: 26px;
+  background: var(--line);
+  display: block;
+}
+.nav-meta {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+/* ── HERO ── */
+/* Inngangsblokk: eyebrow + H1 med punktum + ingress. */
+.hero {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 4.5rem 2rem 3rem;
+}
+.eyebrow {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--blue);
+  margin-bottom: 0.9rem;
+}
+.hero h1,
+.cover h1 {
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+  margin-bottom: 1.5rem;
+  text-wrap: balance;
+}
+/* Bakoverkompatibilitet: v1-dokumenter har <span class="italic"> i H1.
+   I v2 blir aksenten blå, ikke kursiv. Nye dokumenter bruker .dot. */
+.hero h1 .italic,
+.cover h1 .italic { color: var(--blue); font-style: normal; }
+.hero-subtitle {
+  font-size: var(--fs-md);
+  font-weight: 500;
+  color: var(--ink-mid);
+  line-height: 1.4;
+  margin-bottom: 1.2rem;
+  max-width: 640px;
+}
+.hero-ingress {
+  font-size: var(--fs-md);
+  line-height: 1.55;
+  color: var(--ink-mid);
+  max-width: 600px;
+}
+body .hero-ingress { font-size: var(--fs-md); line-height: 1.55; } /* vinner over body p */
+
+/* ── COVER (forside) ── */
+/* Egen forside med logo øverst, stor tittel og en .bigdot nederst til
+   høyre. Gir sideskift etter seg i PDF. */
+.cover {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.cover-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cover-top img { height: 26px; width: auto; display: block; }
+.cover-top span { font-size: var(--fs-sm); font-weight: 500; color: var(--ink-soft); }
+.cover-body { margin-top: 18vh; }
+.cover h1 { font-size: 4rem; }
+.cover-foot {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2rem;
+  padding-top: 3rem;
+}
+.cover-meta { display: grid; gap: 0.2rem; font-size: var(--fs-sm); color: var(--ink-soft); }
+.cover-meta strong { font-size: var(--fs-base); }
+
+/* ── FACT BAR (3 nøkkelfakta) ── */
+/* Hvert faktum har en 2 px blekklinje over seg — samme regel som åpner
+   agenda, datatabell og ratelist. */
+.facts {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 2rem 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+.facts > * {
+  border-top: 2px solid var(--ink);
+  padding-top: 0.75rem;
+}
+.fact-label {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--ink-soft);
+  margin-bottom: 0.2rem;
+}
+.fact-value {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+.fact-sub {
+  font-size: var(--fs-sm);
+  color: var(--ink-soft);
+  margin-top: 0.2rem;
+}
+
+/* ── KPI-RAD (store tall) ── */
+/* 2–4 nøkkeltall i blått. Bruk i rapporter, case og tilbud. */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.5rem;
+  margin: 1.5rem 0 2rem;
+}
+.kpi {
+  border-top: 2px solid var(--ink);
+  padding-top: 0.75rem;
+}
+.kpi-value {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  color: var(--blue);
+}
+.kpi-label {
+  font-size: var(--fs-sm);
+  color: var(--ink-soft);
+  margin-top: 0.35rem;
+  line-height: 1.45;
+}
+
+/* ── CONTENT BLOCK ── */
+.content {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 3.5rem 2rem 2rem;
+}
+.section {
+  margin-bottom: 3.5rem;
+}
+.section + .section { margin-top: 3.5rem; }
+.section-kicker {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--blue);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+.section-num {
+  font-weight: 700;
+  color: var(--blue);
+}
+.section-title {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 1.2rem;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.subsection-title {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--ink);
+  margin: 2rem 0 0.75rem;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+/* Inline-stat: «honoraret på <span class="stat">12 000 kr</span>». */
+.stat,
+.stat-inline {
+  font-weight: 700;
+  color: var(--blue);
+  white-space: nowrap;
+}
+
+/* ── PULL QUOTE ── */
+/* Sitat, sentral påstand eller forskningsspørsmål. */
+.pullquote {
+  margin: 2rem 0;
+  padding: 0.2rem 0 0.2rem 1.5rem;
+  border-left: 3px solid var(--blue);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+/* ── CALLOUT (advarsel/merknad — varm gul) ──
+   Sparsomt: én eller to per dokument. */
+.callout {
+  background: var(--warn-bg);
+  border-left: 3px solid var(--warn-line);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 1.1rem 1.4rem;
+  margin: 1.5rem 0 1.8rem;
+}
+.callout-label {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--warn-ink);
+  margin-bottom: 0.3rem;
+}
+.callout p {
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--ink-mid);
+  margin-bottom: 0;
+}
+.callout p + p { margin-top: 0.6rem; }
+.callout strong { color: var(--ink); }
+
+/* ── RATELIST (etikett + verdi, f.eks. satser/priser) ── */
+.ratelist {
+  margin: 1.2rem 0 2rem;
+  border-top: 2px solid var(--ink);
+}
+.rate-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.5rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--line);
+  align-items: baseline;
+}
+.rate-label {
+  font-size: var(--fs-base);
+  color: var(--ink);
+}
+.rate-label-sub {
+  font-size: var(--fs-sm);
+  color: var(--ink-soft);
+  margin-top: 0.1rem;
+}
+.rate-value {
+  font-weight: 700;
+  color: var(--blue);
+  font-size: var(--fs-md);
+  white-space: nowrap;
+}
+
+/* ── KORT (ett primitiv) ──
+   .card er det nye standardkortet. .cards gir grid (1 kolonne default,
+   .is-2 / .is-3 for flere). v1-klassene defcard, track, scenario,
+   example og hyp er alias og ser likt ut. */
+.cards,
+.scenarios,
+.hypotheses {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin: 1.5rem 0 2rem;
+}
+.cards.is-2,
+.deftable,
+.tracks,
+.examples {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 2rem;
+}
+.cards.is-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.card,
+.defcard,
+.track,
+.scenario,
+.example,
+.hyp {
+  background: var(--mist);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.5rem 1.35rem;
+}
+.card.is-blue {
+  background: var(--blue);
+  color: var(--white);
+}
+.card.is-blue .card-label,
+.card.is-blue .card-title,
+.card.is-blue .card-body { color: var(--white); }
+.card.is-blue .card-body { opacity: 0.88; }
+
+.card-label,
+.defcard-label,
+.track-label,
+.scenario-label,
+.example-label {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--blue);
+  margin-bottom: 0.4rem;
+}
+.card-title,
+.defcard-title,
+.track-title,
+.scenario-title,
+.example-title {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+.card-body,
+.scenario-body {
+  font-size: var(--fs-base);
+  line-height: 1.6;
+  color: var(--ink-mid);
+}
+.defcard-body,
+.track-desc,
+.example-setup {
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--ink-mid);
+}
+.card-body p, .scenario-body p { font-size: inherit; margin-bottom: 0.6rem; }
+.defcard-body strong, .card-body strong { color: var(--ink); }
+
+/* Track: leder-linje nederst */
+.track-desc { margin-bottom: 1rem; }
+.track-lead {
+  font-size: var(--fs-sm);
+  color: var(--ink-mid);
+  border-top: 1px solid var(--line);
+  padding-top: 0.75rem;
+}
+.track-lead-label {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 0.1rem;
+}
+
+/* Hyp: stor blå etikett til venstre (H1, H2 …) */
+.hyp {
+  display: grid;
+  grid-template-columns: 3.25rem 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+.hyp-label {
+  font-weight: 700;
+  font-size: var(--fs-lg);
+  color: var(--blue);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.hyp-body {
+  font-size: var(--fs-base);
+  line-height: 1.6;
+  color: var(--ink-mid);
+}
+
+/* Example: talleksempel med summlinje */
+.example { display: flex; flex-direction: column; }
+.example-setup { margin-bottom: 0.9rem; }
+.example-lines {
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  color: var(--ink-mid);
+  margin-bottom: 0.9rem;
+}
+.example-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.example-line:last-child { border-bottom: none; }
+.example-line-text { color: var(--ink-mid); }
+.example-line-amount { color: var(--ink); white-space: nowrap; }
+.example-total {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 2px solid var(--ink);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+.example-total-label {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.example-total-amount {
+  font-weight: 700;
+  color: var(--blue);
+  font-size: var(--fs-md);
+  white-space: nowrap;
+}
+
+/* ── DATATABLE (3 kolonner) ── */
+.datatable {
+  margin: 1.5rem 0 1.8rem;
+  width: 100%;
+}
+.datatable-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1.2fr 2fr;
+  gap: 1.2rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+}
+.datatable-row.is-head {
+  padding: 0.6rem 0;
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+.datatable-row.is-head > div {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.dt-primary {
+  font-weight: 600;
+  color: var(--ink);
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+}
+.dt-secondary {
+  font-size: var(--fs-sm);
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+.dt-tertiary {
+  font-size: var(--fs-sm);
+  color: var(--ink-mid);
+  line-height: 1.55;
+}
+.datatable.is-2col .datatable-row { grid-template-columns: 1fr 1.2fr 1.6fr; }
+
+/* ── AGENDA (tidslinje) ── */
+.agenda {
+  margin-top: 1.5rem;
+  border-top: 2px solid var(--ink);
+}
+.agenda-row {
+  display: grid;
+  grid-template-columns: 5rem 1fr;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+  align-items: baseline;
+}
+.agenda-time {
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--blue);
+}
+.agenda-body {
+  font-size: var(--fs-base);
+  font-weight: 500;
+  color: var(--ink);
+}
+.agenda-body strong { font-weight: 600; color: var(--ink); }
+.agenda-body-sub {
+  font-size: var(--fs-sm);
+  font-weight: 400;
+  color: var(--ink-soft);
+  margin-top: 0.1rem;
+}
+
+/* ── PRESENTERS ── */
+.presenters {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+.presenter {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+.presenter img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+}
+.presenter-initials {
+  width: 48px;
+  height: 48px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--blue-light);
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+.presenter-name {
+  font-weight: 600;
+  color: var(--ink);
+  font-size: var(--fs-sm);
+}
+.presenter-role {
+  font-size: var(--fs-xs);
+  color: var(--ink-soft);
+}
+
+/* ── REFS / PITFALLS ── */
+.pitfalls {
+  list-style: none;
+  margin: 1.2rem 0 0 0;
+  padding: 0;
+  border-top: 2px solid var(--ink);
+}
+.pitfalls li {
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--fs-base);
+  line-height: 1.6;
+  color: var(--ink-mid);
+}
+.pitfalls li::before { display: none; }
+.pitfalls li strong { color: var(--ink); }
+
+.refs {
+  margin-top: 1rem;
+  list-style: none;
+  padding: 0;
+}
+.refs li {
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  color: var(--ink-mid);
+  padding-left: 1.6rem;
+  text-indent: -1.6rem;
+  margin-bottom: 0.6rem;
+}
+.refs li::before { display: none; }
+.refs li em { font-style: italic; }
+
+/* ── CONTACT CARD ── */
+/* Blå flate med hvit tekst — blåfargen får plass. Én gang per dokument. */
+.contact-card {
+  background: var(--blue);
+  color: var(--white);
+  border-radius: var(--radius);
+  padding: 1.75rem 2rem 1.6rem;
+  margin: 2rem 0 1rem;
+}
+.contact-label {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.4rem;
+}
+.contact-name {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--white);
+  margin-bottom: 0.1rem;
+}
+.contact-role {
+  font-size: var(--fs-base);
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 1rem;
+}
+.contact-detail {
+  font-size: var(--fs-sm);
+  color: var(--white);
+  margin-bottom: 0.2rem;
+}
+.contact-detail a {
+  color: var(--white);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.5);
+  text-underline-offset: 2px;
+}
+.contact-detail a:hover { text-decoration-color: var(--white); }
+
+/* ── BIGDOT (punktumet i stor skala) ── */
+/* Blå sirkel som bærer en CTA eller et nøkkeltall. Maks én per side.
+   .is-right skyver den mot høyre kant. Størrelse via --size. */
+.bigdot {
+  --size: 15rem;
+  width: var(--size);
+  height: var(--size);
+  flex: none;
+  border-radius: 50%;
+  background: var(--blue);
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 calc(var(--size) * 0.17);
+  margin: 2rem 0;
+}
+.bigdot.is-right { margin-left: auto; }
+.bigdot-title {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+.bigdot-value {
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.bigdot-sub {
+  font-size: var(--fs-sm);
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 0.4rem;
+  line-height: 1.4;
+}
+.bigdot a { color: var(--white); text-underline-offset: 2px; }
+
+/* ── PARTNER PANEL ── */
+.partner {
+  max-width: var(--container);
+  margin: 2.5rem auto 0;
+  padding: 0 2rem;
+}
+.partner-inner {
+  background: var(--mist);
+  border-radius: var(--radius);
+  padding: 2.5rem 2.5rem 2.25rem;
+  text-align: center;
+}
+.partner-label {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--ink-soft);
+  margin-bottom: 0.6rem;
+}
+.partner-title {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  margin-bottom: 0.75rem;
+}
+.partner-title .partner-italic {
+  font-style: normal;
+  color: var(--blue);
+}
+.partner-desc {
+  font-size: var(--fs-base);
+  line-height: 1.6;
+  color: var(--ink-mid);
+  max-width: 560px;
+  margin: 0 auto 2rem;
+}
+.partner-lockup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.2rem;
+  flex-wrap: wrap;
+}
+.partner-lockup img { display: block; height: 26px; width: auto; }
+.partner-lockup .partner-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--line);
+  display: block;
+}
+
+/* ── RSVP ── */
+.rsvp {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 3.5rem 2rem 4rem;
+  text-align: center;
+}
+.rsvp-title {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.6rem;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+.rsvp p {
+  font-size: var(--fs-base);
+  color: var(--ink-mid);
+  max-width: 520px;
+  margin: 0 auto 2rem;
+  line-height: 1.65;
+}
+.rsvp-deadline {
+  font-weight: 600;
+  color: var(--blue);
+}
+.rsvp-btn,
+.rsvp-btn:link,
+.rsvp-btn:visited {
+  display: inline-block;
+  background: var(--blue);
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: var(--fs-base);
+  padding: 0.85rem 1.75rem;
+  border-radius: 999px;
+  transition: background 0.2s;
+}
+.rsvp-btn:hover { background: var(--blue-dark); }
+.rsvp-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.8rem;
+  flex-wrap: wrap;
+}
+.rsvp-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+.rsvp-url-inline {
+  font-size: var(--fs-xs);
+  color: var(--ink-soft);
+}
+.rsvp-or-vert {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-sm);
+  color: var(--ink-soft);
+  font-weight: 500;
+  padding: 0 0.4rem;
+  position: relative;
+}
+.rsvp-or-vert::before, .rsvp-or-vert::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 1px;
+  background: var(--line);
+  height: 32px;
+}
+.rsvp-or-vert::before { top: 0; transform: translate(-50%, -100%); }
+.rsvp-or-vert::after { bottom: 0; transform: translate(-50%, 100%); }
+.rsvp-qr-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+.rsvp-qr {
+  display: inline-block;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+}
+.rsvp-qr img { display: block; width: 130px; height: 130px; }
+.rsvp-qr-caption {
+  font-size: var(--fs-xs);
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+/* ── FOOTER ── */
+footer {
+  max-width: var(--container);
+  margin: 2rem auto 0;
+  border-top: 1px solid var(--line);
+  padding: 1.5rem 2rem 2.5rem;
+  font-size: var(--fs-sm);
+  color: var(--ink-soft);
+  background: var(--bg);
+}
+footer p { margin-bottom: 0; font-size: inherit; color: inherit; line-height: inherit; }
+footer a {
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+}
+footer a:hover { color: var(--blue); }
+
+/* =========================================================
+   LOGG-MODUL (valgfri) — «Commit-loggen»
+   Git-inspirerte komponenter for fagkvelder, tekniske case, release
+   notes og rekruttering av utviklere. Alt er opt-in: ingenting her
+   påvirker et dokument som ikke bruker .logg-*- eller .diff-markup.
+   Bruk 1–2 logg-elementer per dokument, ikke alle samtidig.
+   ========================================================= */
+
+/* Hash: <span class="logg-hash">5a1f0c2</span> */
+.logg-hash {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  font-weight: 500;
+  color: var(--logg-hash);
+}
+
+/* Ref-pille (branch/tag), f.eks. i topnav: <span class="logg-ref">fagkveld/mai-2026</span> */
+.logg-ref {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  background: var(--blue-light);
+  color: var(--blue);
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* Kommando-linje over en overskrift: <div class="logg-cmd">git log --graph</div> */
+.logg-cmd {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--ink-soft);
+  margin-bottom: 0.3rem;
+}
+.logg-cmd::before { content: "$ "; color: var(--blue); }
+
+/* Metadata som git-logg. Bruk <dl> så det er lesbart for skjermlesere. */
+.logg-meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  line-height: 1.75;
+  color: var(--ink-mid);
+  margin: 0 0 1.75rem;
+}
+.logg-meta-head { color: var(--ink-soft); }
+.logg-meta-head .logg-hash { font-size: 1em; }
+.logg-meta-head .logg-ref { font-size: 0.85em; padding: 0.05rem 0.55rem; margin-left: 0.4rem; vertical-align: 1px; }
+.logg-meta dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 1.25rem;
+}
+.logg-meta dt { color: var(--ink-soft); }
+.logg-meta dt::after { content: ":"; }
+.logg-meta dd { color: var(--ink); }
+
+/* Git-graf som agenda/tidslinje.
+   <ol class="logg-graph">
+     <li><span class="logg-hash">a1c3f9e</span><time>15:30</time><span><strong>Tittel</strong> · detalj</span></li>
+     <li class="is-branch is-fork">…</li>   ← første rad på sidegren
+     <li class="is-branch">…</li>           ← flere rader på sidegren
+     <li class="is-merge">…</li>            ← grenen flettes tilbake
+   </ol>
+   Linjene tegnes med background-lag (ikke dekor-gradienter). */
+.logg-graph {
+  --lane1: 0.75rem;
+  --lane2: 2rem;
+  list-style: none;
+  margin: 1rem 0 1.75rem;
+  padding: 0;
+  border-top: 2px solid var(--ink);
+}
+.logg-graph > li {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  padding: 0.75rem 0 0.75rem 3rem;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--fs-base);
+  color: var(--ink-mid);
+  background-image: linear-gradient(var(--blue), var(--blue));
+  background-repeat: no-repeat;
+  background-size: 2px 100%;
+  background-position: calc(var(--lane1) - 1px) 0;
+}
+.logg-graph > li:first-child { background-size: 2px 50%; background-position: calc(var(--lane1) - 1px) 100%; }
+.logg-graph > li:last-child  { background-size: 2px 50%; background-position: calc(var(--lane1) - 1px) 0; }
+.logg-graph > li:only-child  { background: none; }
+.logg-graph > li::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--lane1) - 6px);
+  top: calc(50% - 6px);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 2px solid var(--blue);
+}
+.logg-graph > li.is-merge::after,
+.logg-graph > li.is-head::after { background: var(--blue); }
+.logg-graph .logg-hash { flex: 0 0 4.6rem; font-size: var(--fs-xs); }
+.logg-graph time {
+  flex: 0 0 3rem;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--blue);
+}
+.logg-graph strong { color: var(--ink); font-weight: 600; }
+/* Sidegren */
+.logg-graph > li.is-branch {
+  background-image: linear-gradient(var(--blue), var(--blue)), linear-gradient(var(--logg-branch), var(--logg-branch));
+  background-size: 2px 100%, 2px 100%;
+  background-position: calc(var(--lane1) - 1px) 0, calc(var(--lane2) - 1px) 0;
+}
+.logg-graph > li.is-branch::after { left: calc(var(--lane2) - 6px); border-color: var(--logg-branch); }
+.logg-graph > li.is-branch.is-fork {
+  background-size: 2px 100%, 2px 50%;
+  background-position: calc(var(--lane1) - 1px) 0, calc(var(--lane2) - 1px) 100%;
+}
+.logg-graph > li.is-fork::before,
+.logg-graph > li.is-merge::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  height: 50%;
+  width: calc(var(--lane2) - var(--lane1));
+  border-bottom: 2px solid var(--logg-branch);
+}
+.logg-graph > li.is-fork::before {
+  left: calc(var(--lane1) - 1px);
+  border-left: 2px solid var(--logg-branch);
+  border-bottom-left-radius: 12px;
+}
+.logg-graph > li.is-merge::before {
+  left: calc(var(--lane1) + 1px);
+  border-right: 2px solid var(--logg-branch);
+  border-bottom-right-radius: 12px;
+}
+
+/* Diff (før/etter). Bruk <del> og <ins> — de er semantiske og leses
+   opp som «slettet»/«lagt til» av mange skjermlesere.
+   <div class="diff">
+     <div class="diff-head"><span>utbytte.diff</span><span>+1 −1</span></div>
+     <del>Gammel praksis</del>
+     <ins>Ny praksis</ins>
+   </div> */
+.diff {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1.5rem 0 2rem;
+}
+.diff-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--mist);
+  padding: 0.5rem 0.9rem;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--line);
+  font-size: var(--fs-xs);
+}
+.diff del,
+.diff ins,
+.diff .diff-ctx {
+  display: block;
+  text-decoration: none;
+  padding: 0.3rem 0.9rem 0.3rem 2.1rem;
+  position: relative;
+}
+.diff del::before,
+.diff ins::before {
+  position: absolute;
+  left: 0.9rem;
+}
+.diff del { background: var(--diff-del-bg); color: var(--diff-del-ink); }
+.diff del::before { content: "−"; }
+.diff ins { background: var(--diff-add-bg); color: var(--diff-add-ink); }
+.diff ins::before { content: "+"; }
+.diff .diff-ctx { color: var(--ink-mid); }
+
+/* Terminal-knapp: <a class="logg-btn" href="…">git commit -m "Jeg kommer"</a>
+   :link/:visited er med for at ingen lenkeregel (global eller lokal i et
+   dokument) skal kunne farge teksten blå på den mørke flaten. */
+.logg-btn,
+.logg-btn:link,
+.logg-btn:visited {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--fs-base);
+  font-weight: 500;
+  line-height: 1.3;
+  background: var(--ink);
+  color: var(--white);
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.logg-btn::before { content: "$"; color: #8CC8FF; margin-right: 0.6em; font-weight: 700; }
+.logg-btn:hover,
+.logg-btn:focus-visible { background: var(--blue); color: var(--white); }
+.logg-btn:hover::before,
+.logg-btn:focus-visible::before { color: var(--white); }
+
+/* ── RESPONSIVT (< 680 px) ── */
+@media (max-width: 680px) {
+  .hero { padding: 3rem 1.5rem 2.25rem; }
+  .hero h1 { font-size: 2.25rem; }
+  .cover h1 { font-size: 2.5rem; }
+  .hero-subtitle, .hero-ingress, body .hero-ingress { font-size: var(--fs-base); }
+  .facts {
+    grid-template-columns: 1fr;
+    gap: 1.1rem;
+    padding: 0 1.5rem 1rem;
+  }
+  .content { padding: 2.5rem 1.5rem 1.5rem; }
+  .section-title { font-size: 1.5rem; }
+  .cards.is-2, .cards.is-3, .deftable, .tracks, .examples { grid-template-columns: 1fr; }
+  .agenda-row { grid-template-columns: 1fr; gap: 0.2rem; }
+  .nav-wrap { padding: 0 1.5rem; }
+  .rate-row { grid-template-columns: 1fr; gap: 0.2rem; }
+  .datatable-row,
+  .datatable.is-2col .datatable-row { grid-template-columns: 1fr; gap: 0.3rem; }
+  .datatable-row.is-head { display: none; }
+  .hyp { grid-template-columns: 1fr; gap: 0.4rem; }
+  .pullquote { font-size: var(--fs-base); }
+  .partner { padding: 0 1.5rem; }
+  .partner-inner { padding: 2rem 1.5rem; }
+  .rsvp { padding: 2.5rem 1.5rem 3rem; }
+  .rsvp-title { font-size: var(--fs-lg); }
+  .bigdot { --size: 12rem; }
+  .bigdot.is-right { margin-left: auto; margin-right: auto; }
+  .logg-graph .logg-hash { display: none; }
+  .logg-graph > li { flex-wrap: wrap; }
+  footer { padding: 1.5rem 1.5rem 2rem; }
+}
+
+/* ── PRINT/PDF ──
+   20 mm marg rundt hele ved nettleser-print. Playwright bruker 25 mm
+   topp/bunn når sidetopp/-bunn er på. Kort og blokker deles ikke over
+   sideskift. Bakgrunnsfarger skrives ut (print-color-adjust). */
+@page {
+  size: A4;
+  margin: 20mm;
+}
+@media print {
+  html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { background: var(--white); }
+  .hero { padding-top: 2.5rem; }
+  .cover { min-height: 245mm; padding-top: 0; break-after: page; page-break-after: always; }
+  .cover-body { margin-top: 45mm; }
+  .section,
+  .card,
+  .scenario,
+  .hyp,
+  .callout,
+  .contact-card,
+  .pullquote,
+  .track,
+  .example,
+  .defcard,
+  .kpi,
+  .bigdot,
+  .partner-inner,
+  .diff,
+  .logg-meta,
+  .logg-graph > li,
+  .agenda-row,
+  .rate-row { break-inside: avoid; page-break-inside: avoid; }
+  /* Overskrifter skal ikke bli stående alene nederst på en side. */
+  h1, h2, h3,
+  .eyebrow,
+  .section-kicker,
+  .section-title,
+  .subsection-title,
+  .logg-cmd { break-after: avoid; page-break-after: avoid; }
+  footer { margin-top: 1rem; }
+}
