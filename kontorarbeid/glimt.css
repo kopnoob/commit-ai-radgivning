@@ -78,7 +78,7 @@
 /* Liste med rader og status */
 .rows { display: grid; }
 .row {
-  display: grid; grid-template-columns: 1.4fr 1fr auto; gap: 1rem; align-items: center;
+  display: grid; grid-template-columns: 1.1fr 1.3fr auto; gap: 1rem; align-items: center;
   padding: 0.6rem 0; border-top: 1px solid var(--line);
 }
 .row:first-child { border-top: 0; padding-top: 0; }
@@ -131,4 +131,21 @@
   .steps { grid-template-columns: 1fr; gap: 0.6rem; }
   .steps::before { left: calc(0.825rem - 1px); right: auto; top: 0.8rem; bottom: 0.8rem; width: 2px; height: auto; }
   .step { grid-template-columns: 1.65rem 1fr; justify-items: start; text-align: left; gap: 0.7rem; align-items: center; }
+}
+
+/* Tekst i radene og kortene (fiktive eksempeldata) */
+.row-main { font-weight: 600; color: var(--ink); }
+.row-meta { font-size: var(--fs-xs); color: var(--ink-soft); }
+.tender-title { font-weight: 600; color: var(--ink); font-size: var(--fs-base); }
+.tender-meta { font-size: var(--fs-xs); color: var(--ink-soft); }
+.tile-label { font-size: var(--fs-xs); color: var(--ink-soft); }
+.tile-value { font-size: var(--fs-md); font-weight: 700; color: var(--ink); line-height: 1.1; }
+@media (max-width: 680px) {
+  .row { grid-template-columns: 1fr auto; row-gap: 0.1rem; }
+  .row-main { grid-column: 1; grid-row: 1; }
+  .row-meta { grid-column: 1; grid-row: 2; }
+  .row .pill { grid-column: 2; grid-row: 1 / span 2; align-self: center; justify-self: end; }
+  .tiles { grid-template-columns: 1fr; gap: 0.5rem; }
+  .tile { grid-template-columns: 1fr auto; align-items: center; column-gap: 1rem; }
+  .tile .spark { grid-column: 1 / -1; height: 1.6rem; }
 }

@@ -14,7 +14,7 @@ Dette er ikke en demo. Det er en vanlig måned i Commit, et konsulentselskap med
 I karusellen viser vi fem av dem:
 • timeføring som purrer seg selv
 • lønnskjøring på et kvarter
-• salgspost som leser seg selv, hver time
+• nye oppdrag som sorterer seg selv, hver time
 • Doffin som sjekkes hver dag, med søknad på én knapp
 • prosjektøkonomi som er klar før kaffen
 
